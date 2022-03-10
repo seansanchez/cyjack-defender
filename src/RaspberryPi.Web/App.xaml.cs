@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using RaspberryPi.Api.Controllers;
+using Restup.Webserver.File;
+using Restup.Webserver.Http;
+using Restup.Webserver.Rest;
 
 namespace RaspberryPi.Api
 {
@@ -12,6 +17,8 @@ namespace RaspberryPi.Api
     /// </summary>
     sealed partial class App : Application
     {
+        private HttpServer _httpServer;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -27,7 +34,7 @@ namespace RaspberryPi.Api
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -56,11 +63,12 @@ namespace RaspberryPi.Api
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+
+            await this.InitializeWebServerAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -85,6 +93,25 @@ namespace RaspberryPi.Api
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private async Task InitializeWebServerAsync()
+        {
+            // register the api controller
+            var restRouteHandler = new RestRouteHandler();
+            restRouteHandler.RegisterController<ParameterController>();
+
+            var configuration = new HttpServerConfiguration()
+                .ListenOnPort(5000)
+                .RegisterRoute("/api", restRouteHandler)
+                .RegisterRoute("/ui", new StaticFileRouteHandler(@"wwwroot"))
+                .EnableCors();
+
+            var httpServer = new HttpServer(configuration);
+            _httpServer = httpServer;
+
+            // starting the http server
+            await httpServer.StartServerAsync().ConfigureAwait(false);
         }
     }
 }
