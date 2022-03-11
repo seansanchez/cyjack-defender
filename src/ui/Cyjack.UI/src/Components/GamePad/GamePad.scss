@@ -1,0 +1,81 @@
+.GamePad {
+    width: 100%;
+    height: calc(100vh - 4rem);
+    overflow: hidden;
+}
+
+.BrakeButton {
+    position: absolute;
+    bottom: 16rem;
+    right: 2rem;
+    height: 5rem;
+    width: 5rem;
+    border-radius: 50%;
+    border: none;
+    background-color: palevioletred;
+    color: black;
+    font-weight: bold;
+    box-shadow: 0 6.4px 14.4px 0 rgba(0,0,0,.132),0 1.2px 3.6px 0 rgba(0,0,0,.108);
+    transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    user-select: none;
+
+    &:active {
+        transform: scale(1.2) !important;
+    }
+}
+
+.LeftPad {
+    position: absolute;
+    left: 0rem;
+    bottom: 0rem;
+    height: 200px;
+    width: 200px;
+    padding: 2rem;
+    user-select: none;
+    touch-action: none;
+
+    .VertDragArea {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: lightgray;
+        border-radius: 50%;
+        user-select: none;
+        touch-action: none;
+    }
+}
+
+.RightPad {
+    position: absolute;
+    right: 0rem;
+    bottom: 0rem;
+    height: 200px;
+    width: 200px;
+    padding: 2rem;
+    user-select: none;
+    touch-action: none;
+
+    .HorizDragArea {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: lightgray;
+        border-radius: 50%;
+        user-select: none;
+        touch-action: none;
+    }
+}
+
+.ThumbDrag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: 5rem;
+    width: 5rem;
+    border-radius: 50%;
+    background-color: darkgray;
+    pointer-events: none;
+}
