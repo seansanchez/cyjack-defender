@@ -3,6 +3,8 @@ import './GamePad.scss';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
+import { SendControllerCommands } from '../../Services/controller.service';
+
 interface IGamePadState {
     gamepadWasConnected: boolean;
     gamepadConnected: boolean;
@@ -62,6 +64,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                 gamepadConnected: false,
                 gamepadId: null
             });
+            this.stopGamepadInterval();
         }
     }
 
@@ -131,20 +134,14 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                     leftRight = 0;
                 }
 
-                this.setState({
-                    upDown: upDown,
-                    brake: brake,
-                    leftRight: leftRight
-                });
+                this.updateControllerState(upDown, leftRight, brake);
             }
         }
     }
 
     private trackVertPointer(ev: React.PointerEvent, reset?: boolean) {
         if (reset) {
-            this.setState({
-                upDown: 0
-            });
+            this.updateControllerState(0, this.state.leftRight, this.state.brake);
             return;
         }
         const padBoundingRect = ev.currentTarget.getBoundingClientRect();
@@ -154,9 +151,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
         } else if (upDown > 0) {
             upDown = Math.min(upDown, 100);
         }
-        this.setState({
-            upDown: upDown
-        });
+        this.updateControllerState(upDown, this.state.leftRight, this.state.brake);
     }
 
     private trackHorizPointer(ev: React.PointerEvent, reset?: boolean) {
@@ -164,6 +159,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
             this.setState({
                 leftRight: 0
             });
+            this.updateControllerState(this.state.upDown, 0, this.state.brake);
             return;
         }
         const padBoundingRect = ev.currentTarget.getBoundingClientRect();
@@ -173,8 +169,26 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
         } else if (leftRight > 0) {
             leftRight = Math.min(leftRight, 100) * -1;
         }
+        this.updateControllerState(this.state.upDown, leftRight, this.state.brake);
+    }
+
+    private updateBrake(brake: boolean) {
+        this.updateControllerState(this.state.upDown, this.state.leftRight, brake);
+    }
+
+    private updateControllerState(upDown: number, leftRight: number, brake: boolean) {
         this.setState({
-            leftRight: leftRight
+            upDown: upDown,
+            leftRight: leftRight,
+            brake: brake
+        });
+
+        SendControllerCommands({
+            upDown: upDown,
+            leftRight: leftRight,
+            brake: brake
+        }).then(() => null).catch(ex => {
+            console.error(ex);
         });
     }
 
@@ -209,9 +223,12 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                 </div>
                 <motion.button
                     className='BrakeButton'
-                    initial={{ scale: 1 }}
-                    animate={this.state.gamepadId ? { scale: this.state.brake ? 1.2 : 1 } : undefined}
-                    transition={{ type: 'spring', bounce: 0.5 }} >
+                    initial={this.state.brake ? { scale: 1 } : { scale: 1.2 }}
+                    animate={this.state.brake ? { scale: 1.2 } : { scale: 1 }}
+                    transition={{ type: 'spring', bounce: 0.5 }}
+                    onPointerDown={() => this.updateBrake(true)}
+                    onPointerUp={() => this.updateBrake(false)}
+                    onPointerCancel={() => this.updateBrake(false)} >
                     BRAKE
                 </motion.button>
 

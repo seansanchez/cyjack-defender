@@ -16,12 +16,7 @@
     color: black;
     font-weight: bold;
     box-shadow: 0 6.4px 14.4px 0 rgba(0,0,0,.132),0 1.2px 3.6px 0 rgba(0,0,0,.108);
-    transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     user-select: none;
-
-    &:active {
-        transform: scale(1.2) !important;
-    }
 }
 
 .LeftPad {
