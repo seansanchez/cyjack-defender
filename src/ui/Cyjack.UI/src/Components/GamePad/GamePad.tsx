@@ -3,15 +3,21 @@ import './GamePad.scss';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
+import { IControllerState } from '../../Models/IControllerState';
 import { SendControllerCommands } from '../../Services/controller.service';
+
+interface IGamePadProps {
+    apiUrl: string;
+    apiAlive: boolean;
+    checkingApiAlive: boolean;
+}
 
 interface IGamePadState {
     gamepadWasConnected: boolean;
     gamepadConnected: boolean;
     gamepadId: string | null;
-    upDown: number;
-    leftRight: number;
-    brake: boolean;
+    controllerState: IControllerState;
+    prevControllerState: IControllerState;
 }
 
 enum standardButtons {
@@ -23,32 +29,75 @@ enum standardAxis {
     rightHoriz = 2
 }
 
-export class GamePad extends React.Component<Record<string, unknown>, IGamePadState> {
+export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
 
     private gamepadInterval: NodeJS.Timer | null = null;
 
-    constructor(props: Record<string, unknown>) {
+    private apiThrottheInterval: NodeJS.Timer | null = null;
+
+    constructor(props: IGamePadProps) {
         super(props);
 
         this.state = {
             gamepadWasConnected: false,
             gamepadConnected: false,
             gamepadId: null,
-            upDown: 0,
-            leftRight: 0,
-            brake: false
+            controllerState: {
+                upDown: 0,
+                leftRight: 0,
+                brake: false
+            },
+            prevControllerState: {
+                upDown: 0,
+                leftRight: 0,
+                brake: false
+            }
         };
     }
 
     componentDidMount() {
         window.addEventListener('gamepadconnected', (e) => this.handleGamepadConnected(e));
         window.addEventListener('gamepaddisconnected', (e) => this.handleGamepadDisconnected(e));
+        this.startApiThrottler();
     }
 
     componentWillUnmount() {
         window.removeEventListener('gamepadconnected', this.handleGamepadConnected);
         window.removeEventListener('gamepaddisconnected', this.handleGamepadConnected);
         this.stopGamepadInterval();
+        this.stopApiThrotther();
+    }
+
+    private startApiThrottler() {
+        if (!this.apiThrottheInterval) {
+            this.apiThrottheInterval = setInterval(() => {
+                if (this.props.apiAlive) {
+                    const prevState = this.state.prevControllerState;
+                    const currState = this.state.controllerState;
+                    if (currState.upDown !== prevState.upDown ||
+                        currState.leftRight !== prevState.leftRight ||
+                        currState.brake !== prevState.brake) {
+                        this.setState({
+                            prevControllerState: currState
+                        });
+                        SendControllerCommands(this.props.apiUrl, {
+                            upDown: currState.upDown,
+                            leftRight: currState.leftRight,
+                            brake: currState.brake
+                        }).then(() => null).catch(ex => {
+                            console.error(ex);
+                        });
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    private stopApiThrotther() {
+        if (this.apiThrottheInterval) {
+            clearInterval(this.apiThrottheInterval);
+            this.apiThrottheInterval = null;
+        }
     }
 
     private handleGamepadConnected(e: GamepadEvent) {
@@ -97,7 +146,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
 
     private startGamepadInterval() {
         if (this.gamepadInterval === null) {
-            this.gamepadInterval = setInterval(() => this.checkGamepadState(), 50);
+            this.gamepadInterval = setInterval(() => this.checkGamepadState(), 10);
         }
     }
 
@@ -109,14 +158,18 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
     }
 
     private checkGamepadState() {
+        if (!this.props.apiAlive) { 
+            return;
+        }
+        
         const gamepadId = this.state.gamepadId;
         if (gamepadId) {
             const gamepad = navigator.getGamepads().find(g => g?.id === gamepadId);
 
             if (gamepad) {
-                let upDown = this.state.upDown;
-                let brake = this.state.brake;
-                let leftRight = this.state.leftRight;
+                let upDown = this.state.controllerState.upDown;
+                let brake = this.state.controllerState.brake;
+                let leftRight = this.state.controllerState.leftRight;
 
                 brake = this.buttonPressed(gamepad.buttons[standardButtons.brake]);
 
@@ -141,7 +194,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
 
     private trackVertPointer(ev: React.PointerEvent, reset?: boolean) {
         if (reset) {
-            this.updateControllerState(0, this.state.leftRight, this.state.brake);
+            this.updateControllerState(0, this.state.controllerState.leftRight, this.state.controllerState.brake);
             return;
         }
         const padBoundingRect = ev.currentTarget.getBoundingClientRect();
@@ -151,15 +204,12 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
         } else if (upDown > 0) {
             upDown = Math.min(upDown, 100);
         }
-        this.updateControllerState(upDown, this.state.leftRight, this.state.brake);
+        this.updateControllerState(upDown, this.state.controllerState.leftRight, this.state.controllerState.brake);
     }
 
     private trackHorizPointer(ev: React.PointerEvent, reset?: boolean) {
         if (reset) {
-            this.setState({
-                leftRight: 0
-            });
-            this.updateControllerState(this.state.upDown, 0, this.state.brake);
+            this.updateControllerState(this.state.controllerState.upDown, 0, this.state.controllerState.brake);
             return;
         }
         const padBoundingRect = ev.currentTarget.getBoundingClientRect();
@@ -169,32 +219,32 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
         } else if (leftRight > 0) {
             leftRight = Math.min(leftRight, 100) * -1;
         }
-        this.updateControllerState(this.state.upDown, leftRight, this.state.brake);
+        this.updateControllerState(this.state.controllerState.upDown, leftRight, this.state.controllerState.brake);
     }
 
     private updateBrake(brake: boolean) {
-        this.updateControllerState(this.state.upDown, this.state.leftRight, brake);
+        this.updateControllerState(this.state.controllerState.upDown, this.state.controllerState.leftRight, brake);
     }
 
     private updateControllerState(upDown: number, leftRight: number, brake: boolean) {
         this.setState({
-            upDown: upDown,
-            leftRight: leftRight,
-            brake: brake
+            controllerState: {
+                upDown: upDown,
+                leftRight: leftRight,
+                brake: brake
+            }
         });
+    }
 
-        SendControllerCommands({
-            upDown: upDown,
-            leftRight: leftRight,
-            brake: brake
-        }).then(() => null).catch(ex => {
-            console.error(ex);
-        });
+    private preventContextMenu(ev: React.MouseEvent) {
+        if (ev.button != 0) {
+            return false;
+        }
     }
 
     render() {
         return (
-            <div className='GamePad'>
+            <div className='GamePad' style={this.props.apiAlive ? undefined : { pointerEvents: 'none' }}>
                 <div className='LeftPad'
                     onPointerDown={(ev) => this.trackVertPointer(ev)}
                     onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
@@ -205,7 +255,7 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                             className='ThumbDrag'
                             drag={false}
                             initial={{ y: 0 }}
-                            animate={{ y: this.state.upDown * -0.8 }} />
+                            animate={{ y: this.state.controllerState.upDown * -0.8 }} />
                     </div>
                 </div>
                 <div className='RightPad'
@@ -218,17 +268,18 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                             className='ThumbDrag'
                             drag={false}
                             initial={{ x: 0 }}
-                            animate={{ x: this.state.leftRight * 0.8 }} />
+                            animate={{ x: this.state.controllerState.leftRight * 0.8 }} />
                     </div>
                 </div>
                 <motion.button
                     className='BrakeButton'
-                    initial={this.state.brake ? { scale: 1 } : { scale: 1.2 }}
-                    animate={this.state.brake ? { scale: 1.2 } : { scale: 1 }}
+                    initial={this.state.controllerState.brake ? { scale: 1 } : { scale: 1.2 }}
+                    animate={this.state.controllerState.brake ? { scale: 1.2 } : { scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.5 }}
                     onPointerDown={() => this.updateBrake(true)}
                     onPointerUp={() => this.updateBrake(false)}
-                    onPointerCancel={() => this.updateBrake(false)} >
+                    onPointerCancel={() => this.updateBrake(false)}
+                    onClick={(ev) => this.preventContextMenu(ev)} >
                     BRAKE
                 </motion.button>
 
@@ -252,6 +303,46 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                                 transition={{ type: 'spring', bounce: 0.5 }} >
                                 Controller Disconnected
                             </motion.div>
+                        )
+                    }
+                </AnimatePresence>
+
+
+                <AnimatePresence>
+                    {
+                        this.props.checkingApiAlive ? (
+                            <motion.div
+                                key="ValidatingApiAlive"
+                                className='ApiAliveMessage Validating'
+                                initial={{ y: 20, scale: 0.8, opacity: 0 }}
+                                animate={{ y: 0, scale: 1, opacity: 1 }}
+                                transition={{ type: 'spring', bounce: 0.5 }} >
+                                Validating API
+                            </motion.div>
+                        ) : (
+                            this.props.apiAlive ? (
+                                <motion.div
+                                    key="ApiAlive"
+                                    className='ApiAliveMessage Success'
+                                    initial={{ y: 20, scale: 0.8, opacity: 0 }}
+                                    animate={{
+                                        y: [20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20],
+                                        scale: [0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.8],
+                                        opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+                                    }}
+                                    transition={{ type: 'spring', bounce: 0.5 }} >
+                                    API Found
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="ApiNotAlive"
+                                    className='ApiAliveMessage Failure'
+                                    initial={{ y: 20, scale: 0.8, opacity: 0 }}
+                                    animate={{ y: 0, scale: 1, opacity: 1 }}
+                                    transition={{ type: 'spring', bounce: 0.5 }} >
+                                    API Not Found
+                                </motion.div>
+                            )
                         )
                     }
                 </AnimatePresence>

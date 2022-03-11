@@ -5,11 +5,32 @@
 }
 
 .App-header {
-  height: 4rem;
+  height: 6.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: 28px;
   color: white;
+}
+
+.AppNameLabel {
+  margin-top: 0;
+}
+
+.ApiUrlInput {
+  background-color: transparent;
+  border: 2px solid white;
+  border-radius: 8px;
+  padding: 0.25rem;
+  color: white;
+}
+
+.ApiUrlLabel {
+  position: absolute;
+  left: 0.25rem;
+  bottom: 80%;
+  color: white;
+  font-size: 12px;
+  text-align: left;
 }

@@ -15,7 +15,7 @@
     background-color: palevioletred;
     color: black;
     font-weight: bold;
-    box-shadow: 0 6.4px 14.4px 0 rgba(0,0,0,.132),0 1.2px 3.6px 0 rgba(0,0,0,.108);
+    box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.132), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.108);
     user-select: none;
 }
 
@@ -82,10 +82,38 @@
     right: 0;
     width: 12rem;
     margin: auto;
-    background-color: rgb(20, 20, 20);
+    background-color: #141414;
     color: white;
     border-radius: 8px;
     padding: 0.25rem;
     font-weight: bold;
     text-align: center;
+}
+
+.ApiAliveMessage {
+    position: absolute;
+    bottom: 4rem;
+    left: 0;
+    right: 0;
+    width: 8rem;
+    margin: auto;
+    border-radius: 8px;
+    padding: 0.25rem;
+    font-weight: bold;
+    text-align: center;
+
+    &.Validating {
+        background-color: lightskyblue;
+        color: black;
+    }
+
+    &.Success {
+        background-color: #77dd77;
+        color: black;
+    }
+
+    &.Failure {
+        background-color: #ff6961;
+        color: black;
+    }
 }
