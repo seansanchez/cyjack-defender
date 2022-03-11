@@ -79,3 +79,18 @@
     background-color: darkgray;
     pointer-events: none;
 }
+
+.ConnectedMessage {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0;
+    right: 0;
+    width: 12rem;
+    margin: auto;
+    background-color: rgb(20, 20, 20);
+    color: white;
+    border-radius: 8px;
+    padding: 0.25rem;
+    font-weight: bold;
+    text-align: center;
+}

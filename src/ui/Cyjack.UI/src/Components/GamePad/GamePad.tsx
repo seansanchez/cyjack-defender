@@ -1,9 +1,11 @@
 import './GamePad.scss';
 
-import { motion, PanInfo } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 interface IGamePadState {
+    gamepadWasConnected: boolean;
+    gamepadConnected: boolean;
     gamepadId: string | null;
     upDown: number;
     leftRight: number;
@@ -21,13 +23,14 @@ enum standardAxis {
 
 export class GamePad extends React.Component<Record<string, unknown>, IGamePadState> {
 
-    private vertPointer: number | null = null;
-    private horizPointer: number | null = null;
+    private gamepadInterval: NodeJS.Timer | null = null;
 
     constructor(props: Record<string, unknown>) {
         super(props);
 
         this.state = {
+            gamepadWasConnected: false,
+            gamepadConnected: false,
             gamepadId: null,
             upDown: 0,
             leftRight: 0,
@@ -36,26 +39,42 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
     }
 
     componentDidMount() {
-        window.addEventListener('gamepadconnected', (e) => {
-            const gp = navigator.getGamepads()[e.gamepad.index];
-            this.tryConnectGamepad(gp);
-        });
-        window.addEventListener('gamepaddisconnected', (e) => {
-            if (this.state.gamepadId && this.state.gamepadId === e.gamepad.id) {
-                this.setState({
-                    gamepadId: null
-                });
-            }
-        });
+        window.addEventListener('gamepadconnected', (e) => this.handleGamepadConnected(e));
+        window.addEventListener('gamepaddisconnected', (e) => this.handleGamepadDisconnected(e));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('gamepadconnected', this.handleGamepadConnected);
+        window.removeEventListener('gamepaddisconnected', this.handleGamepadConnected);
+        this.stopGamepadInterval();
+    }
+
+    private handleGamepadConnected(e: GamepadEvent) {
+        const gp = navigator.getGamepads()[e.gamepad.index];
+        this.tryConnectGamepad(gp);
+    }
+
+    private handleGamepadDisconnected(e: GamepadEvent) {
+        if (this.state.gamepadId && this.state.gamepadId === e.gamepad.id) {
+            const gamepadWasConnected = this.state.gamepadConnected;
+            this.setState({
+                gamepadWasConnected: gamepadWasConnected,
+                gamepadConnected: false,
+                gamepadId: null
+            });
+        }
     }
 
     private tryConnectGamepad(gamepad: Gamepad | null) {
         if (gamepad && gamepad.buttons.length > 0) {
+            const gamepadWasConnected = this.state.gamepadConnected;
             this.setState({
+                gamepadWasConnected: gamepadWasConnected,
+                gamepadConnected: true,
                 gamepadId: gamepad.id
             });
 
-            this.checkGamepadState();
+            this.startGamepadInterval();
         }
     }
 
@@ -73,15 +92,29 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
         return false;
     }
 
+    private startGamepadInterval() {
+        if (this.gamepadInterval === null) {
+            this.gamepadInterval = setInterval(() => this.checkGamepadState(), 50);
+        }
+    }
+
+    private stopGamepadInterval() {
+        if (this.gamepadInterval !== null) {
+            clearInterval(this.gamepadInterval);
+            this.gamepadInterval = null;
+        }
+    }
+
     private checkGamepadState() {
         const gamepadId = this.state.gamepadId;
         if (gamepadId) {
             const gamepad = navigator.getGamepads().find(g => g?.id === gamepadId);
-            let upDown = this.state.upDown;
-            let brake = this.state.brake;
-            let leftRight = this.state.leftRight;
 
             if (gamepad) {
+                let upDown = this.state.upDown;
+                let brake = this.state.brake;
+                let leftRight = this.state.leftRight;
+
                 brake = this.buttonPressed(gamepad.buttons[standardButtons.brake]);
 
                 const vert = gamepad.axes[standardAxis.leftVert];
@@ -105,9 +138,6 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                 });
             }
         }
-        setTimeout(() => {
-            this.checkGamepadState();
-        }, 50);
     }
 
     private trackVertPointer(ev: React.PointerEvent, reset?: boolean) {
@@ -184,6 +214,30 @@ export class GamePad extends React.Component<Record<string, unknown>, IGamePadSt
                     transition={{ type: 'spring', bounce: 0.5 }} >
                     BRAKE
                 </motion.button>
+
+                <AnimatePresence>
+                    {
+                        this.state.gamepadConnected ? (
+                            <motion.div
+                                key="ConnectedMessage"
+                                className="ConnectedMessage"
+                                initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
+                                animate={{ y: 0, scale: 1, opacity: 1 }}
+                                transition={{ type: 'spring', bounce: 0.5 }} >
+                                Controller Connected
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="DisconnectedMessage"
+                                className='ConnectedMessage'
+                                initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
+                                animate={{ y: 0, scale: 1, opacity: 1 }}
+                                transition={{ type: 'spring', bounce: 0.5 }} >
+                                Controller Disconnected
+                            </motion.div>
+                        )
+                    }
+                </AnimatePresence>
             </div>
         );
     }
