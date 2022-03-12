@@ -1,7 +1,9 @@
 .App {
+  height: calc(min(100vh, 450px));
+  width: calc(min(100vw, 1000px));
+  position: relative;
   text-align: center;
   overflow: hidden !important;
-  background-color: #282c34;
 }
 
 .App-header {
