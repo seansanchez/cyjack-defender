@@ -29,7 +29,7 @@ export function SaveLastApiUrl(apiUrl: string) {
 
 export function GetLastApiUrl(): string {
     const apiUrl = localStorage.getItem(ApiUrlKey);
-    return apiUrl ? apiUrl : 'http://localhost:8080';
+    return apiUrl ? apiUrl : 'http://localhost:5000/api';
 }
 
 export function SaveLastInput(inputMapping: IInputMapping) {
