@@ -2,11 +2,11 @@ import './App.scss';
 
 import React, { useState } from 'react';
 
-import { CheckApiAlive, GetInputMappings, GetLastInputMapping, SaveLastInput as SaveLastInputMapping } from '../Services/controller.service';
+import { CheckApiAlive, GetInputMappings, GetLastApiUrl, GetLastInputMapping, SaveLastApiUrl, SaveLastInput as SaveLastInputMapping } from '../Services/controller.service';
 import { GamePad } from './GamePad/GamePad';
 
 function App() {
-    const [apiUrl, setApiUrl] = useState('http://localhost:8800');
+    const [apiUrl, setApiUrl] = useState(GetLastApiUrl());
     const [apiAlive, setApiAlive] = useState(false);
     const [checkingApiAlive, setCheckingApiAlive] = useState(false);
     const [inputMapping, setInputMapping] = useState(GetLastInputMapping());
@@ -15,6 +15,7 @@ function App() {
         const apiUrl = ev.currentTarget.value.trim();
         setCheckingApiAlive(true);
         setApiUrl(apiUrl);
+        SaveLastApiUrl(apiUrl);
         if (apiUrl.length > 0 && apiUrl.includes('http://')) {
             CheckApiAlive(apiUrl).then(alive => {
                 setApiAlive(alive);

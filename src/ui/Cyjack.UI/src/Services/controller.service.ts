@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { IControllerState } from '../Models/IControllerState';
 import { IInputMapping, InputType } from '../Models/IInputMapping';
 
+const ApiUrlKey = 'ApiUrl';
 const inputMappingsKey = 'InputMappings';
 
 export async function CheckApiAlive(apiUrl: string) {
@@ -20,6 +21,15 @@ export async function SendControllerCommands(apiUrl: string, controllerState: IC
     );
 
     return response.data;
+}
+
+export function SaveLastApiUrl(apiUrl: string) {
+    localStorage.setItem(ApiUrlKey, apiUrl);
+}
+
+export function GetLastApiUrl(): string {
+    const apiUrl = localStorage.getItem(ApiUrlKey);
+    return apiUrl ? apiUrl : 'http://localhost:8080';
 }
 
 export function SaveLastInput(inputMapping: IInputMapping) {
