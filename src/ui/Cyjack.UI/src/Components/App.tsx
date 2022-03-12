@@ -2,14 +2,14 @@ import './App.scss';
 
 import React, { useState } from 'react';
 
-import { CheckApiAlive, GetInputMappings } from '../Services/controller.service';
+import { CheckApiAlive, GetInputMappings, GetLastInputMapping, SaveLastInput as SaveLastInputMapping } from '../Services/controller.service';
 import { GamePad } from './GamePad/GamePad';
 
 function App() {
     const [apiUrl, setApiUrl] = useState('http://localhost:8800');
     const [apiAlive, setApiAlive] = useState(false);
     const [checkingApiAlive, setCheckingApiAlive] = useState(false);
-    const [inputMapping, setInputMapping] = useState(GetInputMappings()[0]);
+    const [inputMapping, setInputMapping] = useState(GetLastInputMapping());
 
     const updateApiUrl = (ev: React.ChangeEvent<HTMLInputElement>) => {
         const apiUrl = ev.currentTarget.value.trim();
@@ -31,6 +31,7 @@ function App() {
         const selectedInputMapping = GetInputMappings().find(m => m.name === inputMappingName);
         if (selectedInputMapping) {
             setInputMapping(selectedInputMapping);
+            SaveLastInputMapping(selectedInputMapping);
         }
     };
 

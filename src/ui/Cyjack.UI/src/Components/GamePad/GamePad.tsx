@@ -51,6 +51,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     componentDidMount() {
         window.addEventListener('gamepadconnected', (e) => this.handleGamepadConnected(e));
         window.addEventListener('gamepaddisconnected', (e) => this.handleGamepadDisconnected(e));
+        this.startGamepadInterval();
         this.startApiThrottler();
     }
 
@@ -118,13 +119,11 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                 gamepadConnected: true,
                 gamepadId: gamepad.id
             });
-
-            this.startGamepadInterval();
         }
     }
 
     private buttonPressed(button: GamepadButton): boolean {
-        if (typeof (button) == 'object') {
+        if (typeof (button) === 'object') {
             return button.pressed;
         }
         return button == 1.0;
@@ -135,6 +134,13 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
             return Math.abs(axis) > 0.1;
         }
         return false;
+    }
+
+    private triggerPressed(button: GamepadButton): boolean {
+        if (typeof (button) === 'object') {
+            return button.touched || button.pressed;
+        }
+        return button == 1.0;
     }
 
     private startGamepadInterval() {
@@ -179,7 +185,13 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     if (this.buttonPressed(gamepad.buttons[inputMapping.forward.index])) {
                         up = 100;
                     }
+                } else if (inputMapping.forward.type === InputType.Trigger) {
+                    const trigger = gamepad.buttons[inputMapping.forward.index];
+                    if (this.triggerPressed(trigger)) {
+                        up = trigger.value * 100;
+                    }
                 }
+
                 if (inputMapping.reverse.type === InputType.Analog) {
                     const vert = gamepad.axes[inputMapping.reverse.index];
                     if (this.axisPressed(vert)) {
@@ -189,7 +201,13 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     if (this.buttonPressed(gamepad.buttons[inputMapping.reverse.index])) {
                         down = -100;
                     }
+                } else if (inputMapping.reverse.type === InputType.Trigger) {
+                    const trigger = gamepad.buttons[inputMapping.reverse.index];
+                    if (this.triggerPressed(trigger)) {
+                        down = trigger.value * -100;
+                    }
                 }
+
                 upDown = up + down;
 
                 let left = 0;
@@ -201,7 +219,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     }
                 } else if (inputMapping.left.type === InputType.Button) {
                     if (this.buttonPressed(gamepad.buttons[inputMapping.left.index])) {
-                        left = 100;
+                        left = -100;
                     }
                 }
                 if (inputMapping.right.type === InputType.Analog) {
@@ -211,9 +229,10 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     }
                 } else if (inputMapping.right.type === InputType.Button) {
                     if (this.buttonPressed(gamepad.buttons[inputMapping.right.index])) {
-                        right = -100;
+                        right = 100;
                     }
                 }
+
                 leftRight = left + right;
 
                 this.updateControllerState(upDown, leftRight, brake);
