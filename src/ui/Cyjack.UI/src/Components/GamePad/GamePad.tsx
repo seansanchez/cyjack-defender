@@ -4,12 +4,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 import { IControllerState } from '../../Models/IControllerState';
+import { IInputMapping, InputType } from '../../Models/IInputMapping';
 import { SendControllerCommands } from '../../Services/controller.service';
 
 interface IGamePadProps {
     apiUrl: string;
     apiAlive: boolean;
     checkingApiAlive: boolean;
+    inputMapping: IInputMapping;
 }
 
 interface IGamePadState {
@@ -18,15 +20,6 @@ interface IGamePadState {
     gamepadId: string | null;
     controllerState: IControllerState;
     prevControllerState: IControllerState;
-}
-
-enum standardButtons {
-    brake = 0,
-}
-
-enum standardAxis {
-    leftVert = 1,
-    rightHoriz = 2
 }
 
 export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
@@ -158,34 +151,70 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     }
 
     private checkGamepadState() {
-        if (!this.props.apiAlive) { 
-            return;
-        }
-        
         const gamepadId = this.state.gamepadId;
         if (gamepadId) {
             const gamepad = navigator.getGamepads().find(g => g?.id === gamepadId);
 
             if (gamepad) {
+                const inputMapping = this.props.inputMapping;
                 let upDown = this.state.controllerState.upDown;
                 let brake = this.state.controllerState.brake;
                 let leftRight = this.state.controllerState.leftRight;
 
-                brake = this.buttonPressed(gamepad.buttons[standardButtons.brake]);
-
-                const vert = gamepad.axes[standardAxis.leftVert];
-                if (this.axisPressed(vert)) {
-                    upDown = vert * 100 * -1;
-                } else {
-                    upDown = 0;
+                if (inputMapping.brake.type === InputType.Button) {
+                    brake = this.buttonPressed(gamepad.buttons[inputMapping.brake.index]);
+                } else if (inputMapping.brake.type === InputType.Analog) {
+                    const brakeAxis = gamepad.axes[inputMapping.brake.index];
+                    brake = this.axisPressed(brakeAxis)
                 }
 
-                const horiz = gamepad.axes[standardAxis.rightHoriz];
-                if (this.axisPressed(horiz)) {
-                    leftRight = horiz * 100;
-                } else {
-                    leftRight = 0;
+                let up = 0;
+                let down = 0;
+                if (inputMapping.forward.type === InputType.Analog) {
+                    const vert = gamepad.axes[inputMapping.forward.index];
+                    if (this.axisPressed(vert)) {
+                        up = Math.min(vert * 100 * -1, 0);
+                    }
+                } else if (inputMapping.forward.type === InputType.Button) {
+                    if (this.buttonPressed(gamepad.buttons[inputMapping.forward.index])) {
+                        up = 100;
+                    }
                 }
+                if (inputMapping.reverse.type === InputType.Analog) {
+                    const vert = gamepad.axes[inputMapping.reverse.index];
+                    if (this.axisPressed(vert)) {
+                        down = Math.max(vert * 100 * -1, 0);
+                    }
+                } else if (inputMapping.reverse.type === InputType.Button) {
+                    if (this.buttonPressed(gamepad.buttons[inputMapping.reverse.index])) {
+                        down = -100;
+                    }
+                }
+                upDown = up + down;
+
+                let left = 0;
+                let right = 0;
+                if (inputMapping.left.type === InputType.Analog) {
+                    const vert = gamepad.axes[inputMapping.left.index];
+                    if (this.axisPressed(vert)) {
+                        left = Math.min(vert * 100, 0);
+                    }
+                } else if (inputMapping.left.type === InputType.Button) {
+                    if (this.buttonPressed(gamepad.buttons[inputMapping.left.index])) {
+                        left = 100;
+                    }
+                }
+                if (inputMapping.right.type === InputType.Analog) {
+                    const vert = gamepad.axes[inputMapping.right.index];
+                    if (this.axisPressed(vert)) {
+                        right = Math.max(vert * 100, 0);
+                    }
+                } else if (inputMapping.right.type === InputType.Button) {
+                    if (this.buttonPressed(gamepad.buttons[inputMapping.right.index])) {
+                        right = -100;
+                    }
+                }
+                leftRight = left + right;
 
                 this.updateControllerState(upDown, leftRight, brake);
             }
@@ -237,19 +266,20 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     }
 
     private preventContextMenu(ev: React.MouseEvent) {
-        if (ev.button != 0) {
-            return false;
-        }
+        ev.preventDefault();
+        ev.stopPropagation();
+        return false;
     }
 
     render() {
         return (
-            <div className='GamePad' style={this.props.apiAlive ? undefined : { pointerEvents: 'none' }}>
+            <div className='GamePad' onContextMenu={(ev) => this.preventContextMenu(ev)}>
                 <div className='LeftPad'
                     onPointerDown={(ev) => this.trackVertPointer(ev)}
                     onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
                     onPointerUp={(ev) => this.trackVertPointer(ev, true)}
-                    onPointerMove={(ev) => this.trackVertPointer(ev)}>
+                    onPointerMove={(ev) => this.trackVertPointer(ev)}
+                    onContextMenu={(ev) => this.preventContextMenu(ev)}>
                     <div className="VertDragArea">
                         <motion.div
                             className='ThumbDrag'
@@ -262,7 +292,8 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     onPointerDown={(ev) => this.trackHorizPointer(ev)}
                     onPointerCancel={(ev) => this.trackHorizPointer(ev, true)}
                     onPointerUp={(ev) => this.trackHorizPointer(ev, true)}
-                    onPointerMove={(ev) => this.trackHorizPointer(ev)}>
+                    onPointerMove={(ev) => this.trackHorizPointer(ev)}
+                    onContextMenu={(ev) => this.preventContextMenu(ev)}>
                     <div className="HorizDragArea">
                         <motion.div
                             className='ThumbDrag'
@@ -279,7 +310,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                     onPointerDown={() => this.updateBrake(true)}
                     onPointerUp={() => this.updateBrake(false)}
                     onPointerCancel={() => this.updateBrake(false)}
-                    onClick={(ev) => this.preventContextMenu(ev)} >
+                    onContextMenu={(ev) => this.preventContextMenu(ev)} >
                     BRAKE
                 </motion.button>
 
