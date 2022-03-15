@@ -10,22 +10,25 @@ steps:
       versionSpec: '12.x'
     displayName: 'Install Node.js'
 
-  - script: |
-      @echo on
-      cd $(Build.SourcesDirectory)\src\Cyjack.UI
+  - script: 
       npm install
+    displayName: 'npm install'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+
+  - script: 
       npm run build
-    displayName: 'npm install and build'
+    displayName: 'npm build'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
 
   - task: NuGetToolInstaller@1
   
   - task: NuGetCommand@2
     inputs:
-      restoreSolution: '**/*.sln'
+      restoreSolution: '**/CyjackDefender.sln'
   
   - task: VSBuild@1
     inputs:
       platform: 'ARM'
-      solution: '**/*.sln'
+      solution: '**/CyjackDefender.sln'
       configuration: '${{ parameters.configuration }}'
       msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'

@@ -24,12 +24,12 @@ steps:
   
   - task: NuGetCommand@2
     inputs:
-      restoreSolution: '**/*.sln'
+      restoreSolution: '**/CyjackDefender.sln'
   
   - task: VSBuild@1
     inputs:
       platform: 'ARM'
-      solution: '**/*.sln'
+      solution: '**/CyjackDefender.sln'
       configuration: '${{ parameters.configuration }}'
       msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
     
