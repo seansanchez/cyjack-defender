@@ -11,9 +11,12 @@ steps:
     displayName: 'Install Node.js'
 
   - script: |
-      echo '$(Build.SourcesDirectory)\src\Cyjack.UI'
-      cd '$(Build.SourcesDirectory)\src\Cyjack.UI'
+      @echo on
+      echo '$(Build.SourcesDirectory)\src\Cyjack.UI\\'
+      cd '$(Build.SourcesDirectory)\src\Cyjack.UI\\'
+      echo 'install'
       npm install
+      echo 'build'
       npm run build
     displayName: 'npm install and build'
 
