@@ -15,7 +15,7 @@
   <mp:PhoneIdentity PhoneProductId="b5799894-b2a4-4782-b5fc-01bab9423e70" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>RaspberryPi.Api</DisplayName>
+    <DisplayName>RaspberryPi.Web</DisplayName>
     <PublisherDisplayName>atila</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -31,12 +31,12 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="RaspberryPi.Api.App">
+      EntryPoint="RaspberryPi.Web.App">
       <uap:VisualElements
-        DisplayName="RaspberryPi.Api"
+        DisplayName="RaspberryPi.Web"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="RaspberryPi.Api"
+        Description="RaspberryPi.Web"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
