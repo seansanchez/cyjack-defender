@@ -11,7 +11,7 @@ steps:
     displayName: 'Install Node.js'
 
   - script: |
-      cd '$(Build.SourcesDirectory)/src/Cyjack.UI'
+      cd '$(Build.SourcesDirectory)\src\Cyjack.UI'
       npm install
       npm run build
     displayName: 'npm install and build'
@@ -27,7 +27,7 @@ steps:
       platform: 'x86'
       solution: '**/*.sln'
       configuration: '${{ parameters.configuration }}'
-      msbuildArgs: '/p:AppxBundlePlatforms="x86|x64|ARM" /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+      msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
     
   - publish: '$(build.artifactStagingDirectory)\AppxPackages\\'
     displayName: 'Publish - App'
