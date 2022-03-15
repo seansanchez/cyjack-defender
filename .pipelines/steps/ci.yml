@@ -1,0 +1,40 @@
+parameters:
+  - name: configuration
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'x86|x64|ARM'
+  appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
+
+steps:
+
+  - checkout: self
+    submodules: recursive
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '12.x'
+    displayName: 'Install Node.js'
+
+  - script: |
+      cd '$(Build.SourcesDirectory)/src/Cyjack.UI'
+      npm install
+      npm run build
+    displayName: 'npm install and build'
+
+  - task: NuGetToolInstaller@1
+  
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '$(solution)'
+  
+  - task: VSBuild@1
+    inputs:
+      platform: 'x86'
+      solution: '$(solution)'
+      configuration: '${{ parameters.configuration }}'
+      msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+    
+  - publish: '$(appxPackageDir)'
+    displayName: 'Publish - App'
+    artifact: 'drop'
