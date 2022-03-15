@@ -11,6 +11,7 @@ steps:
     displayName: 'Install Node.js'
 
   - script: |
+      Write-Host '$(Build.SourcesDirectory)\src\Cyjack.UI'
       cd '$(Build.SourcesDirectory)\src\Cyjack.UI'
       npm install
       npm run build
