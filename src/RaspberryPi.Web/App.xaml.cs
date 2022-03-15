@@ -5,12 +5,12 @@ using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using RaspberryPi.Api.Controllers;
+using RaspberryPi.Web.Controllers;
 using Restup.Webserver.File;
 using Restup.Webserver.Http;
 using Restup.Webserver.Rest;
 
-namespace RaspberryPi.Api
+namespace RaspberryPi.Web
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.

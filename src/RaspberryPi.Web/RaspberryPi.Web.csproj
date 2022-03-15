@@ -7,8 +7,8 @@
     <ProjectGuid>{9D57DB4F-A75A-4709-A81F-AB6D4F59E129}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RaspberryPi.Api</RootNamespace>
-    <AssemblyName>RaspberryPi.Api</AssemblyName>
+    <RootNamespace>RaspberryPi.Web</RootNamespace>
+    <AssemblyName>RaspberryPi.Web</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>

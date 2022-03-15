@@ -1,9 +1,9 @@
-﻿using RaspberryPi.Api.Models;
+﻿using RaspberryPi.Web.Models;
 using Restup.Webserver.Attributes;
 using Restup.Webserver.Models.Contracts;
 using Restup.Webserver.Models.Schemas;
 
-namespace RaspberryPi.Api.Controllers
+namespace RaspberryPi.Web.Controllers
 {
     [RestController(InstanceCreationType.Singleton)]
     public class ParameterController
