@@ -1,13 +1,7 @@
 parameters:
   - name: configuration
 
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'x86|x64|ARM'
-  appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
-
 steps:
-
   - checkout: self
     submodules: recursive
 
@@ -17,7 +11,7 @@ steps:
     displayName: 'Install Node.js'
 
   - script: |
-      cd '$(Build.SourcesDirectory)/src/Cyjack.UI'
+      cd '$(Build.SourcesDirectory)\src\Cyjack.UI'
       npm install
       npm run build
     displayName: 'npm install and build'
@@ -26,11 +20,11 @@ steps:
   
   - task: NuGetCommand@2
     inputs:
-      restoreSolution: '$(solution)'
+      restoreSolution: '**/*.sln'
   
   - task: VSBuild@1
     inputs:
       platform: 'x86'
-      solution: '$(solution)'
+      solution: '**/*.sln'
       configuration: '${{ parameters.configuration }}'
-      msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+      msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
