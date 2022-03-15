@@ -2,12 +2,14 @@ parameters:
   - name: configuration
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'x86|x64|ARM'
-  appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
+- name: solution
+  value: '**/*.sln'
+- name: buildPlatform
+  value: 'x86|x64|ARM'
+- name: appxPackageDir
+  value: '$(build.artifactStagingDirectory)\AppxPackages\\'
 
 steps:
-
   - checkout: self
     submodules: recursive
 
