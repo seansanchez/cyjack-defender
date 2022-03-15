@@ -1,14 +1,6 @@
 parameters:
   - name: configuration
 
-variables:
-- name: solution
-  value: '**/*.sln'
-- name: buildPlatform
-  value: 'x86|x64|ARM'
-- name: appxPackageDir
-  value: '$(build.artifactStagingDirectory)\AppxPackages\\'
-
 steps:
   - checkout: self
     submodules: recursive
@@ -28,15 +20,15 @@ steps:
   
   - task: NuGetCommand@2
     inputs:
-      restoreSolution: '$(solution)'
+      restoreSolution: '**/*.sln'
   
   - task: VSBuild@1
     inputs:
       platform: 'x86'
-      solution: '$(solution)'
+      solution: '**/*.sln'
       configuration: '${{ parameters.configuration }}'
-      msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+      msbuildArgs: '/p:AppxBundlePlatforms="x86|x64|ARM" /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
     
-  - publish: '$(appxPackageDir)'
+  - publish: '$(build.artifactStagingDirectory)\AppxPackages\\'
     displayName: 'Publish - App'
     artifact: 'drop'
