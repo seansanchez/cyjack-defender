@@ -10,12 +10,15 @@ steps:
       versionSpec: '12.x'
     displayName: 'Install Node.js'
 
-  - script: |
-      @echo on
-      cd $(Build.SourcesDirectory)\src\Cyjack.UI
+  - script: 
       npm install
+    displayName: 'npm install'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+
+  - script: 
       npm run build
-    displayName: 'npm install and build'
+    displayName: 'npm build'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
 
   - task: NuGetToolInstaller@1
   
