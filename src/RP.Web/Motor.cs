@@ -4,9 +4,9 @@ namespace RP.Web
 {
     public class Motor : IDisposable
     {
-        private int _forwardPin;
-        private int _backwardPin;
-        private GpioController _gpio;
+        private readonly int _forwardPin;
+        private readonly int _backwardPin;
+        private readonly GpioController _gpio;
 
         public Motor(int forwardPin, int backwardPin)
         {
