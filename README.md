@@ -26,6 +26,40 @@ sudo bash ./dotnet-install.sh --channel LTS --install-dir /opt/dotnet/
 sudo ln -s /opt/dotnet/dotnet /usr/local/bin
 echo 'export DOTNET_ROOT=/opt/dotnet' >> /home/ubuntu/.bashrc
 ```
+8. Install Apache Web Server
+```
+sudo apt install apache2
+
+sudo a2enmod rewrite
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo a2enmod headers
+sudo a2enmod ssl
+
+sudo a2dissite 000-default.conf
+
+sudo nano /etc/apache2/sites-available/webnixfile.conf
+
+##
+<VirtualHost *:80>
+   ServerName www.example.COM
+   ProxyPreserveHost On
+   ProxyPass / http://localhost:5000/
+   ProxyPassReverse / http://localhost:5000/
+   RewriteEngine on
+   RewriteCond %{HTTP:UPGRADE} ^WebSocket$ [NC]
+   RewriteCond %{HTTP:CONNECTION} Upgrade$ [NC]
+   RewriteRule /(.*) ws://127.0.0.1:5000/$1 [P]
+   ErrorLog ${APACHE_LOG_DIR}/error-webnix.com.log
+   CustomLog ${APACHE_LOG_DIR}/access-webnix.com.log combined
+</VirtualHost>
+###
+
+sudo a2ensite webnixfile.conf
+sudo systemctl restart apache2
+
+https://tutexchange.com/how-to-host-asp-net-core-app-on-ubuntu-with-apache-webserver/#:~:text=How%20to%20Host%20ASP.NET%20Core%20App%20on%20Ubuntu,Runtime%20allows%20you%20to%20run%20apps%20that%20
+```
 
 ### Endpoints
 * API: http://{ipAddress}:5000/api
