@@ -1,0 +1,38 @@
+parameters:
+  - name: configuration
+
+steps:
+  - checkout: self
+    submodules: recursive
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '12.x'
+    displayName: 'Install Node.js'
+
+  - script: 
+      npm install
+    displayName: 'npm install'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+
+  - script: 
+      npm run build
+    displayName: 'npm build'
+    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+
+  - task: NuGetToolInstaller@1
+  
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '**/CyjackDefender.sln'
+  
+  - task: VSBuild@1
+    inputs:
+      platform: 'ARM'
+      solution: '**/CyjackDefender.sln'
+      configuration: '${{ parameters.configuration }}'
+      msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+    
+  - publish: '$(build.artifactStagingDirectory)\AppxPackages\\'
+    displayName: 'Publish - App'
+    artifact: 'drop'
