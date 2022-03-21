@@ -1,0 +1,33 @@
+trigger:
+ - 'main'
+
+pr:
+ - 'main'
+ - 'develop'
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+
+- stage: PR_Build
+  displayName: PR Build
+  condition: in(variables['Build.Reason'], 'PullRequest', 'Schedule')
+  jobs:
+    - job: PR_Build
+      displayName: PR Build
+      steps:
+        - template: 'steps/pr.yml'
+          parameters:
+            configuration: Debug
+
+- stage: CI_Build
+  displayName: CI Build
+  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Triggered')
+  jobs:
+    - job: CI_Build
+      displayName: CI Build
+      steps:
+        - template: 'steps/ci.yml'
+          parameters:
+            configuration: Release
