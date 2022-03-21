@@ -75,7 +75,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             prevControllerState: currState
                         });
                         SendControllerCommands(this.props.apiUrl, {
-                            upDown: currState.upDown,
+                            forwardReverse: currState.upDown,
                             leftRight: currState.leftRight,
                             brake: currState.brake
                         }).then(() => null).catch(ex => {

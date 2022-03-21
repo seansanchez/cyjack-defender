@@ -1,21 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { IControllerState } from '../Models/IControllerState';
+import { IApiControllerState } from '../Models/IControllerState';
 import { IInputMapping, InputType } from '../Models/IInputMapping';
 
 const ApiUrlKey = 'ApiUrl';
 const inputMappingsKey = 'InputMappings';
 
 export async function CheckApiAlive(apiUrl: string) {
-    const response: AxiosResponse = await axios.get<boolean>(`${apiUrl}/Alive`,
+    const response: AxiosResponse = await axios.get(`${apiUrl}/gpio/alive`,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
     return response.data;
 }
 
-export async function SendControllerCommands(apiUrl: string, controllerState: IControllerState) {
-    const response: AxiosResponse = await axios.post(`${apiUrl}/ControllerState`,
+export async function SendControllerCommands(apiUrl: string, controllerState: IApiControllerState) {
+    const response: AxiosResponse = await axios.post(`${apiUrl}/gpio/state`,
         controllerState,
         { headers: { 'Content-Type': 'application/json' } }
     );

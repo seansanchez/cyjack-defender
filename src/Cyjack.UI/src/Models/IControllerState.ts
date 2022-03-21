@@ -3,3 +3,9 @@ export interface IControllerState {
     leftRight: number;
     brake: boolean;
 }
+
+export interface IApiControllerState {
+    forwardReverse: number;
+    leftRight: number;
+    brake: boolean;
+}
