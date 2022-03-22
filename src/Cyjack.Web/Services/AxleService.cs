@@ -33,33 +33,33 @@ namespace Cyjack.Web.Services
             }
             else if (controlState.leftRight > 0 && controlState.upDown == 0)
             {
-                _leftMotor.Backward();
-                _rightMotor.Forward();
+                _leftMotor.Forward();
+                _rightMotor.Backward();
             }
             else if (controlState.leftRight < 0 && controlState.upDown == 0)
             {
-                _leftMotor.Forward()
-                _rightMotor.Backward();
-            }
-            else if (controlState.UpDown > 0 && controlState.leftRight > 0)
-            {
-                _leftMotor.Off();
+                _leftMotor.Backward()
                 _rightMotor.Forward();
             }
-            else if (controlState.UpDown > 0 && controlState.leftRight < 0)
+            else if (controlState.UpDown > 0 && controlState.leftRight > 0)
             {
                 _leftMotor.Forward();
                 _rightMotor.Off();
             }
-            else if (controlState.UpDown < 0 && controlState.leftRight > 0)
+            else if (controlState.UpDown > 0 && controlState.leftRight < 0)
             {
                 _leftMotor.Off();
-                _rightMotor.Backward();
+                _rightMotor.Forward();
             }
-            else if (controlState.UpDown < 0 && controlState.leftRight < 0)
+            else if (controlState.UpDown < 0 && controlState.leftRight > 0)
             {
                 _leftMotor.Backward();
                 _rightMotor.Off();
+            }
+            else if (controlState.UpDown < 0 && controlState.leftRight < 0)
+            {
+                _leftMotor.Off();
+                _rightMotor.Backward();
             }
         }
 
