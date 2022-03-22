@@ -32,47 +32,47 @@ namespace Cyjack.Web.Machine
 
         public void Control(ControlState controlState)
         {
-            if (this.isStopped(controlState))
+            if (this.IsStopped(controlState))
             {
                 _leftMotor.Off();
                 _rightMotor.Off();
             }
-            else if (this.isDrivingForward(controlState) && this.isNotTurning(controlState))
+            else if (this.IsDrivingForward(controlState) && this.IsNotTurning(controlState))
             {
                 _leftMotor.Forward();
                 _rightMotor.Forward();
             }
-            else if (this.isDrivingBackward(controlState) && this.isNotTurning(controlState))
+            else if (this.IsDrivingBackward(controlState) && this.IsNotTurning(controlState))
             {
                 _leftMotor.Backward();
                 _rightMotor.Backward();
             }
-            else if (this.isTurningRight(controlState) && this.isNotDriving(controlState))
+            else if (this.IsTurningRight(controlState) && this.IsNotDriving(controlState))
             {
                 _leftMotor.Forward();
                 _rightMotor.Backward();
             }
-            else if (controthis.isTurningLeft(controlState) && this.isNotDriving(controlState))
+            else if (this.IsTurningLeft(controlState) && this.IsNotDriving(controlState))
             {
-                _leftMotor.Backward()
+                _leftMotor.Backward();
                 _rightMotor.Forward();
             }
-            else if (this.isDrivingForward(controlState) && this.isTurningRight(controlState))
+            else if (this.IsDrivingForward(controlState) && this.IsTurningRight(controlState))
             {
                 _leftMotor.Forward();
                 _rightMotor.Off();
             }
-            else if (this.isDrivingForward(controlState) && this.isTurningLeft(controlState))
+            else if (this.IsDrivingForward(controlState) && this.IsTurningLeft(controlState))
             {
                 _leftMotor.Off();
                 _rightMotor.Forward();
             }
-            else if (this.isDrivingBackward(controlState) && this.isTurningRight(controlState))
+            else if (this.IsDrivingBackward(controlState) && this.IsTurningRight(controlState))
             {
                 _leftMotor.Backward();
                 _rightMotor.Off();
             }
-            else if (this.isDrivingBackward(controlState) && this.isTurningLeft(controlState))
+            else if (this.IsDrivingBackward(controlState) && this.IsTurningLeft(controlState))
             {
                 _leftMotor.Off();
                 _rightMotor.Backward();
@@ -95,32 +95,32 @@ namespace Cyjack.Web.Machine
             };
         }
 
-        private isTurningRight(ControlState controlState) {
+        private bool IsTurningRight(ControlState controlState) {
             return controlState.LeftRight > 0;
         }
 
-        private isTurningLeft(ControlState controlState) {
+        private bool IsTurningLeft(ControlState controlState) {
             return controlState.LeftRight < 0;
         }
 
-        private isNotTurning(ControlState controlState) {
+        private bool IsNotTurning(ControlState controlState) {
             return controlState.LeftRight == 0;
         }
 
-        private isDrivingForward(ControlState controlState) {
+        private bool IsDrivingForward(ControlState controlState) {
             return controlState.UpDown > 0;
         }
 
-        private isDrivingBackward(ControlState controlState) {
+        private bool IsDrivingBackward(ControlState controlState) {
             return controlState.UpDown < 0;
         }
 
-        private isNotDriving(ControlState controlState) {
+        private bool IsNotDriving(ControlState controlState) {
             return controlState.UpDown == 0;
         }
 
-        private isStopped(ControlState controlState) {
-            return controlState.Brake || (this.isNotTurning(controlState) && this.isNotDriving(controlState));
+        private bool IsStopped(ControlState controlState) {
+            return controlState.Brake || (this.IsNotTurning(controlState) && this.IsNotDriving(controlState));
         }
     }
 }
