@@ -16,28 +16,50 @@ namespace Cyjack.Web.Services
 
         public void Control(ControlState controlState)
         {
-            if (controlState.Brake)
+            if (controlState.Brake || (controlState.updown == 0 && controlState.leftRight == 0))
             {
                 _leftMotor.Off();
                 _rightMotor.Off();
             }
-            else
+            else if (controlState.UpDown > 0 && controlState.leftRight == 0)
             {
-                if (controlState.UpDown == 0)
-                {
-                    _leftMotor.Off();
-                    _rightMotor.Off();
-                }
-                else if (controlState.UpDown > 0)
-                {
-                    _leftMotor.Forward();
-                    _rightMotor.Forward();
-                }
-                else if (controlState.UpDown < 0)
-                {
-                    _leftMotor.Backward();
-                    _rightMotor.Backward();
-                }
+                _leftMotor.Forward();
+                _rightMotor.Forward();
+            }
+            else if (controlState.UpDown < 0 && controlState.leftRight == 0)
+            {
+                _leftMotor.Backward();
+                _rightMotor.Backward();
+            }
+            else if (controlState.leftRight > 0 && controlState.upDown == 0)
+            {
+                _leftMotor.Backward();
+                _rightMotor.Forward();
+            }
+            else if (controlState.leftRight < 0 && controlState.upDown == 0)
+            {
+                _leftMotor.Forward()
+                _rightMotor.Backward();
+            }
+            else if (controlState.UpDown > 0 && controlState.leftRight > 0)
+            {
+                _leftMotor.Off();
+                _rightMotor.Forward();
+            }
+            else if (controlState.UpDown > 0 && controlState.leftRight < 0)
+            {
+                _leftMotor.Forward();
+                _rightMotor.Off();
+            }
+            else if (controlState.UpDown < 0 && controlState.leftRight > 0)
+            {
+                _leftMotor.Off();
+                _rightMotor.Backward();
+            }
+            else if (controlState.UpDown < 0 && controlState.leftRight < 0)
+            {
+                _leftMotor.Backward();
+                _rightMotor.Off();
             }
         }
 
