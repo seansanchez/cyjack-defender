@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace cyjack_defender
+namespace Cyjack.Functions
 {
-    public static class cyjackDefender
+    public class Function1
     {
-        [FunctionName("cyjack-defender")]
-        public static async Task Run([EventHubTrigger("cyjack-defender", Connection = "AzureEventHubConnectionString")] EventData[] events, ILogger log)
+        [FunctionName("Function1")]
+        public async Task Run([EventHubTrigger("samples-workitems", Connection = "")] EventData[] events, ILogger log)
         {
             var exceptions = new List<Exception>();
 
