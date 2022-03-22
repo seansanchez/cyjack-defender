@@ -2,13 +2,13 @@
 
 namespace Cyjack.Web.Services
 {
-    public class MotorService : IDisposable
+    public class Motor : IDisposable
     {
         private readonly int _forwardPin;
         private readonly int _backwardPin;
         private readonly GpioController _gpio;
 
-        public MotorService(int forwardPin, int backwardPin)
+        public Motor(int forwardPin, int backwardPin)
         {
             _forwardPin = forwardPin;
             _backwardPin = backwardPin;

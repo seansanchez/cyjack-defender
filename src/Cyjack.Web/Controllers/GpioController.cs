@@ -9,9 +9,9 @@ namespace Cyjack.Web.Controllers
     [Route("api/[controller]")]
     public class GpioController : ControllerBase
     {
-        private readonly IAxleService _axle;
+        private readonly IAxle _axle;
 
-        public GpioController(IAxleService axle)
+        public GpioController(IAxle axle)
         {
             axle.ShouldNotBeNull(nameof(axle));
 

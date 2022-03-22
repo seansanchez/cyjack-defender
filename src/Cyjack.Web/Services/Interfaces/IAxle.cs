@@ -2,7 +2,7 @@
 
 namespace Cyjack.Web.Services
 {
-    public interface IAxleService
+    public interface IAxle
     {
         void Control(ControlState controlState);
 

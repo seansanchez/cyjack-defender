@@ -9,11 +9,6 @@ namespace Cyjack.Web
     /// </summary>
     public class Startup
     {
-        private const int LeftForwardPin = 17;
-        private const int LeftBackwardPin = 18;
-        private const int RightForwardPin = 23;
-        private const int RightBackwardPin = 22;
-
         private readonly IConfiguration _configuration;
 
         /// <summary>
@@ -44,10 +39,9 @@ namespace Cyjack.Web
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            services.AddSingleton<IAxleService>(
-                new AxleService(
-                    leftMotor: new MotorService(forwardPin: LeftForwardPin, backwardPin: LeftBackwardPin),
-                    rightMotor: new MotorService(forwardPin: RightForwardPin, backwardPin: RightBackwardPin)));
+            services.AddSingleton<IAxle, Axle>();
+
+                services.AddHostedService<DefenderService>();
         }
 
         /// <summary>

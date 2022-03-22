@@ -1,17 +1,33 @@
 ﻿using System.Device.Gpio;
+using Cyjack.Extensions;
 using Cyjack.Web.Services.Entities;
+using Microsoft.Extensions.Options;
 
 namespace Cyjack.Web.Services
 {
-    public class AxleService : IAxleService
+    public class Axle : IAxle
     {
-        private readonly MotorService _leftMotor;
-        private readonly MotorService _rightMotor;
+        private readonly ILogger<Axle> _logger;
+        private readonly Motor _leftMotor;
+        private readonly Motor _rightMotor;
 
-        public AxleService(MotorService leftMotor, MotorService rightMotor)
+        public Axle(
+            IOptions<CyjackWebOptions> options,
+            ILogger<Axle> logger)
         {
-            _leftMotor = leftMotor ?? throw new ArgumentNullException(nameof(leftMotor));
-            _rightMotor = rightMotor ?? throw new ArgumentNullException(nameof(rightMotor));
+            options.ShouldNotBeNull(nameof(options));
+            options.Value.ShouldNotBeNull($"{nameof(options)}.{nameof(options.Value)}");
+            logger.ShouldNotBeNull(nameof(logger));
+
+            _logger = logger;
+
+            _leftMotor = new Motor(
+                forwardPin: options.Value.LeftForwardPin,
+                backwardPin: options.Value.LeftBackwardPin);
+
+            _rightMotor = new Motor(
+                forwardPin: options.Value.RightForwardPin,
+                backwardPin: options.Value.RightBackwardPin);
         }
 
         public void Control(ControlState controlState)
