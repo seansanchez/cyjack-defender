@@ -1,9 +1,9 @@
 ﻿using System.Device.Gpio;
 using Cyjack.Extensions;
-using Cyjack.Web.Services.Entities;
+using Cyjack.Web.Machine.Entities;
 using Microsoft.Extensions.Options;
 
-namespace Cyjack.Web.Services
+namespace Cyjack.Web.Machine
 {
     public class Axle : IAxle
     {

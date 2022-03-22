@@ -1,6 +1,6 @@
 ﻿using Cyjack.Extensions;
-using Cyjack.Web.Services;
-using Cyjack.Web.Services.Entities;
+using Cyjack.Web.Machine;
+using Cyjack.Web.Machine.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cyjack.Web.Controllers

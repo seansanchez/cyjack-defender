@@ -1,6 +1,6 @@
-﻿using Cyjack.Web.Services.Entities;
+﻿using Cyjack.Web.Machine.Entities;
 
-namespace Cyjack.Web.Services
+namespace Cyjack.Web.Machine
 {
     public interface IAxle
     {

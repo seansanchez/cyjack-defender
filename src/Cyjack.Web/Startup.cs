@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Cyjack.Extensions;
-using Cyjack.Web.Services;
+using Cyjack.Web.Machine;
 
 namespace Cyjack.Web
 {
@@ -39,9 +39,9 @@ namespace Cyjack.Web
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            services.AddConfigurationOptions<CyjackWebOptions>(nameof(CyjackWebOptions));
             services.AddSingleton<IAxle, Axle>();
-
-                services.AddHostedService<DefenderService>();
+            services.AddHostedService<IoTDeviceClientService>();
         }
 
         /// <summary>

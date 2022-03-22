@@ -1,6 +1,6 @@
 ﻿using System.Device.Gpio;
 
-namespace Cyjack.Web.Services
+namespace Cyjack.Web.Machine
 {
     public class Motor : IDisposable
     {
