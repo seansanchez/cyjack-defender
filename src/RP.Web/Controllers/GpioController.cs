@@ -11,20 +11,26 @@ namespace RP.Web.Controllers
         private const int RightForwardPin = 23;
         private const int RightBackwardPin = 22;
 
-        private readonly Motor _leftMotor;
-        private readonly Motor _rightMotor;
+        private readonly Axle _axle;
 
         public GpioController()
         {
-            _leftMotor = new Motor(forwardPin: LeftForwardPin, backwardPin: LeftBackwardPin);
-            _rightMotor = new Motor(forwardPin: RightForwardPin, backwardPin: RightBackwardPin);
+            var leftMotor = new Motor(forwardPin: LeftForwardPin, backwardPin: LeftBackwardPin);
+            var rightMotor = new Motor(forwardPin: RightForwardPin, backwardPin: RightBackwardPin);
+
+            _axle = new Axle(leftMotor: leftMotor, rightMotor: rightMotor);
         }
 
-        [HttpGet("forward")]
-        public IActionResult GoForward()
+        [HttpGet("Alive")]
+        public IActionResult GetHealth()
         {
-            _leftMotor.Forward();
-            _rightMotor.Forward();
+            return Ok();
+        }
+
+        [HttpPost("ControllerState")]
+        public IActionResult Control(ControlState controlState)
+        {
+            this._axle.Control(controlState);
 
             return Ok();
         }
