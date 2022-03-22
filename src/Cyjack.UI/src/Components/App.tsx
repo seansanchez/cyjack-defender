@@ -17,8 +17,8 @@ function App() {
         setApiUrl(apiUrl);
         SaveLastApiUrl(apiUrl);
         if (apiUrl.length > 0 && apiUrl.includes('http://')) {
-            CheckApiAlive(apiUrl).then(alive => {
-                setApiAlive(alive);
+            CheckApiAlive(apiUrl).then(() => {
+                setApiAlive(true);
                 setCheckingApiAlive(false);
             }).catch(() => {
                 setApiAlive(false);

@@ -1,4 +1,4 @@
-﻿using System.Device.Gpio;
+using System.Device.Gpio;
 using Cyjack.Extensions;
 using Cyjack.Web.Machine.Entities;
 using Microsoft.Extensions.Options;
@@ -32,28 +32,50 @@ namespace Cyjack.Web.Machine
 
         public void Control(ControlState controlState)
         {
-            if (controlState.Brake)
+            if (this.isStopped(controlState))
             {
                 _leftMotor.Off();
                 _rightMotor.Off();
             }
-            else
+            else if (this.isDrivingForward(controlState) && this.isNotTurning(controlState))
             {
-                if (controlState.UpDown == 0)
-                {
-                    _leftMotor.Off();
-                    _rightMotor.Off();
-                }
-                else if (controlState.UpDown > 0)
-                {
-                    _leftMotor.Forward();
-                    _rightMotor.Forward();
-                }
-                else if (controlState.UpDown < 0)
-                {
-                    _leftMotor.Backward();
-                    _rightMotor.Backward();
-                }
+                _leftMotor.Forward();
+                _rightMotor.Forward();
+            }
+            else if (this.isDrivingBackward(controlState) && this.isNotTurning(controlState))
+            {
+                _leftMotor.Backward();
+                _rightMotor.Backward();
+            }
+            else if (this.isTurningRight(controlState) && this.isNotDriving(controlState))
+            {
+                _leftMotor.Forward();
+                _rightMotor.Backward();
+            }
+            else if (controthis.isTurningLeft(controlState) && this.isNotDriving(controlState))
+            {
+                _leftMotor.Backward()
+                _rightMotor.Forward();
+            }
+            else if (this.isDrivingForward(controlState) && this.isTurningRight(controlState))
+            {
+                _leftMotor.Forward();
+                _rightMotor.Off();
+            }
+            else if (this.isDrivingForward(controlState) && this.isTurningLeft(controlState))
+            {
+                _leftMotor.Off();
+                _rightMotor.Forward();
+            }
+            else if (this.isDrivingBackward(controlState) && this.isTurningRight(controlState))
+            {
+                _leftMotor.Backward();
+                _rightMotor.Off();
+            }
+            else if (this.isDrivingBackward(controlState) && this.isTurningLeft(controlState))
+            {
+                _leftMotor.Off();
+                _rightMotor.Backward();
             }
         }
 
@@ -71,6 +93,34 @@ namespace Cyjack.Web.Machine
                 LeftRight = 0,
                 UpDown = left + right
             };
+        }
+
+        private isTurningRight(ControlState controlState) {
+            return controlState.LeftRight > 0;
+        }
+
+        private isTurningLeft(ControlState controlState) {
+            return controlState.LeftRight < 0;
+        }
+
+        private isNotTurning(ControlState controlState) {
+            return controlState.LeftRight == 0;
+        }
+
+        private isDrivingForward(ControlState controlState) {
+            return controlState.UpDown > 0;
+        }
+
+        private isDrivingBackward(ControlState controlState) {
+            return controlState.UpDown < 0;
+        }
+
+        private isNotDriving(ControlState controlState) {
+            return controlState.UpDown == 0;
+        }
+
+        private isStopped(ControlState controlState) {
+            return controlState.Brake || (this.isNotTurning(controlState) && this.isNotDriving(controlState));
         }
     }
 }

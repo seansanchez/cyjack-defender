@@ -7,7 +7,7 @@ const ApiUrlKey = 'ApiUrl';
 const inputMappingsKey = 'InputMappings';
 
 export async function CheckApiAlive(apiUrl: string) {
-    const response: AxiosResponse = await axios.get<boolean>(`${apiUrl}/Alive`,
+    const response: AxiosResponse = await axios.get(`${apiUrl}/Alive`,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
