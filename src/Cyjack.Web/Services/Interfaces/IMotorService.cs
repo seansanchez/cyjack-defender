@@ -1,6 +1,6 @@
 ﻿using System.Device.Gpio;
 
-namespace Cyjack.Web.Machine
+namespace Cyjack.Web.Services
 {
     public interface IMotorService
     {

@@ -1,5 +1,4 @@
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+using Cyjack.Extensions;
 
 namespace Cyjack.Web
 {
@@ -21,7 +20,7 @@ namespace Cyjack.Web
             Host.CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(builder =>
                 {
-                    // builder.Configure();
+                    builder.Configure();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

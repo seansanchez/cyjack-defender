@@ -1,7 +1,7 @@
 ﻿using System.Device.Gpio;
-using Cyjack.Web.Machine.Entities;
+using Cyjack.Web.Services.Entities;
 
-namespace Cyjack.Web.Machine
+namespace Cyjack.Web.Services
 {
     public class AxleService : IAxleService
     {
