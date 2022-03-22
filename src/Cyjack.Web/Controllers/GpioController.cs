@@ -1,6 +1,6 @@
 ﻿using Cyjack.Extensions;
-using Cyjack.Web.Services;
-using Cyjack.Web.Services.Entities;
+using Cyjack.Web.Machine;
+using Cyjack.Web.Machine.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cyjack.Web.Controllers
@@ -9,9 +9,9 @@ namespace Cyjack.Web.Controllers
     [Route("api/[controller]")]
     public class GpioController : ControllerBase
     {
-        private readonly IAxleService _axle;
+        private readonly IAxle _axle;
 
-        public GpioController(IAxleService axle)
+        public GpioController(IAxle axle)
         {
             axle.ShouldNotBeNull(nameof(axle));
 

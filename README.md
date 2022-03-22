@@ -5,11 +5,6 @@
 * MicroSD Card
 * Ethernet Cable
 
-### Dependencies
-* Visual Studio 2019 / 2022
-  * Workload: Universal Windows Platform development
-* [Windows 10 IoT Core Dashboard](https://docs.microsoft.com/en-us/windows/iot-core/connect-your-device/iotdashboard)
-
 ### Setup
 
 #### Install OS and Connect to Pi via SSH
@@ -62,5 +57,4 @@ https://tutexchange.com/how-to-host-asp-net-core-app-on-ubuntu-with-apache-webse
 ```
 
 ### Endpoints
-* API: http://{ipAddress}:5000/api
-* UI: http://{ipAddress}:5000/ui
+* API: http://{ipAddress}/swagger

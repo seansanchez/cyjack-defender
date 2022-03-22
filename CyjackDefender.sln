@@ -8,9 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyjack.Functions", "src\Cyjack.Functions\Cyjack.Functions.csproj", "{BC7BE989-CFE5-47E5-B1D5-D8DF13194564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyjack.Functions", "src\Cyjack.Functions\Cyjack.Functions.csproj", "{BC7BE989-CFE5-47E5-B1D5-D8DF13194564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyjack", "src\Cyjack\Cyjack.csproj", "{BBABE9D4-1E9B-49AA-A03C-FC6B00734787}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyjack", "src\Cyjack\Cyjack.csproj", "{BBABE9D4-1E9B-49AA-A03C-FC6B00734787}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyjack.Web", "src\Cyjack.Web\Cyjack.Web.csproj", "{350F83AA-297E-4059-9288-115BEBA9D776}"
 EndProject
