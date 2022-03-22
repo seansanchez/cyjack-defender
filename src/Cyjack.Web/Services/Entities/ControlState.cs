@@ -1,4 +1,4 @@
-﻿namespace RP.Web
+﻿namespace Cyjack.Web.Machine.Entities
 {
     public class ControlState
     {

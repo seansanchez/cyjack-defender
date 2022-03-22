@@ -1,13 +1,14 @@
 ﻿using System.Device.Gpio;
+using Cyjack.Web.Machine.Entities;
 
-namespace RP.Web
+namespace Cyjack.Web.Machine
 {
-    public class Axle
+    public class AxleService : IAxleService
     {
-        private readonly Motor _leftMotor;
-        private readonly Motor _rightMotor;
+        private readonly MotorService _leftMotor;
+        private readonly MotorService _rightMotor;
 
-        public Axle(Motor leftMotor, Motor rightMotor)
+        public AxleService(MotorService leftMotor, MotorService rightMotor)
         {
             _leftMotor = leftMotor ?? throw new ArgumentNullException(nameof(leftMotor));
             _rightMotor = rightMotor ?? throw new ArgumentNullException(nameof(rightMotor));
