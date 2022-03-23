@@ -80,3 +80,16 @@ steps:
   - publish: '$(System.ArtifactsDirectory)/drop'
     displayName: 'Publish - drop'
     artifact: 'drop'
+
+  - task: PowerShell@2
+    displayName: 'Buildout Artifacts'
+    inputs:
+      targetType: 'filePath'
+      filePath: '$(Build.SourcesDirectory)/.scripts/ExpandArtifacts.ps1'
+      arguments: >
+        -inputPath '$(Build.SourcesDirectory)/.pipelines/buildout/global'
+        -outputPath '$(Build.ArtifactStagingDirectory)/output/buildout/global'
+
+  - publish: '$(Build.ArtifactStagingDirectory)/output/buildout'
+    displayName: 'Publish - Buildout Artifacts'
+    artifact: 'buildout'

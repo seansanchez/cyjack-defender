@@ -1,0 +1,13 @@
+{
+  "ppe": {
+    "AzureSubscriptionId": "af3d8302-6040-4b18-83ae-cb207debfcd3",
+    "Environment": "ppe",
+    "LocationCode": "usw2",
+    "AcrName": "nimbusppe",
+    "BotDisplayName": "[PPE] Fenix",
+    "BotAadApplicationId": "61addd18-a27b-40c6-8b3f-10f4b0b6d1c3",
+    "BotMessagingEndpoint": "https://fenix.usw2.ppe.nimbus.aes.me/api/messages",
+    "LuisApplicationId": "11d3ba83-cbd8-49f7-805e-0b43d3ad0343",
+    "DeveloperAccessPolicyEnabled": true
+  }
+}

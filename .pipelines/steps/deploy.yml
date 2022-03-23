@@ -1,6 +1,36 @@
+parameters:
+  - name: armDeploymentSubscription
+    type: string
+  - name: armDeploymentResourceGroup
+    type: string
+  - name: armDeploymentLocation
+    type: string
+  - name: configurationName
+    type: string
+  - name: functionAppName
+    type: string
+
 steps:
   - checkout: self
     submodules: recursive
+
+  - download: current
+    displayName: 'Download - Buildout Artifacts'
+    artifact: 'buildout'
+
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'ARM Template Deployment'
+    inputs:
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
+      resourceGroupName: '${{ parameters.armDeploymentResourceGroup }}'
+      location: '${{ parameters.armDeploymentLocation }}'
+      csmFile: '$(Pipeline.Workspace)/buildout/global/arm/templates/deployment-template.json'
+      csmParametersFile: '$(Pipeline.Workspace)/buildout/global/arm/parameters/${{ parameters.configurationName }}._deployment-parameters.json'
+      deploymentMode: 'Incremental'
+      deploymentOutputs: 'ArmOutputs'
+
+  - pwsh: $(Build.SourcesDirectory)/.scripts/Sleep.ps1 -seconds 30
+    displayName: 'Sleep 30 seconds'
 
   - download: current
     displayName: 'Download - drop'
@@ -8,7 +38,7 @@ steps:
 
   - task: AzureFunctionApp@1
     inputs:
-      azureSubscription: 'VSE-150'
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
       appType: 'functionAppLinux'
       appName: 'cyjack-defender'
       package: '$(Pipeline.Workspace)/drop/Cyjack.Functions.zip'
