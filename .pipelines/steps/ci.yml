@@ -15,28 +15,30 @@ steps:
   - script: 
       npm install
     displayName: 'npm install'
-    workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
+    workingDirectory: src/Cyjack.UI
 
   - script: 
       npm run build
     displayName: 'npm build'
-    workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
+    workingDirectory: src/Cyjack.UI
 
-  #- task: CopyFiles@2
-  #  inputs:
-  #    Contents: '$(Build.SourcesDirectory)/src/ui/**'
-  #    TargetFolder: '$(Build.ArtifactStagingDirectory)/output/ui'
-  #
-  #- task: ArchiveFiles@2
-  #  displayName: "Archive files"
-  #  inputs:
-  #    rootFolderOrFile: $(Build.ArtifactStagingDirectory)/output/ui
-  #    includeRootFolder: false
-  #    archiveFile: "$(System.ArtifactsDirectory)/output/Cyjack.UI.zip"
-  #
-  #- publish: '$(System.ArtifactsDirectory)/output/Cyjack.UI.zip'
-  #  displayName: 'Publish - Function App'
-  #  artifact: 'drop'
+  - task: CopyFiles@2
+    displayName: 'Copy files'
+    inputs:
+      sourceFolder: src/ui
+      Contents: '**/*'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/output/ui'
+  
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/output/ui
+      includeRootFolder: false
+      archiveFile: "$(System.ArtifactsDirectory)/output/Cyjack.UI.zip"
+  
+  - publish: '$(System.ArtifactsDirectory)/output/Cyjack.UI.zip'
+    displayName: 'Publish - Function App'
+    artifact: 'drop'
 
   - task: UseDotNet@2
     displayName: 'Use .NET Core 6.0.x'
