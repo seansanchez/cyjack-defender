@@ -7,7 +7,7 @@ const ApiUrlKey = 'ApiUrl';
 const inputMappingsKey = 'InputMappings';
 
 export async function CheckApiAlive(apiUrl: string) {
-    const response: AxiosResponse = await axios.get(`${apiUrl}/Alive`,
+    const response: AxiosResponse = await axios.get(`${apiUrl}/Gpio/Alive`,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
@@ -15,7 +15,7 @@ export async function CheckApiAlive(apiUrl: string) {
 }
 
 export async function SendControllerCommands(apiUrl: string, controllerState: IControllerState) {
-    const response: AxiosResponse = await axios.post(`${apiUrl}/ControllerState`,
+    const response: AxiosResponse = await axios.post(`${apiUrl}/Gpio/ControllerState`,
         controllerState,
         { headers: { 'Content-Type': 'application/json' } }
     );
@@ -29,7 +29,7 @@ export function SaveLastApiUrl(apiUrl: string) {
 
 export function GetLastApiUrl(): string {
     const apiUrl = localStorage.getItem(ApiUrlKey);
-    return apiUrl ? apiUrl : 'http://localhost:5000/api';
+    return apiUrl ? apiUrl : 'http://localhost:80/api';
 }
 
 export function SaveLastInput(inputMapping: IInputMapping) {
