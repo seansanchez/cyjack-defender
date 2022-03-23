@@ -22,10 +22,15 @@ steps:
     displayName: 'npm build'
     workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
 
+  - task: CopyFiles@2
+    inputs:
+      Contents: 'src/ui'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/output/ui'
+
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
-      rootFolderOrFile: $(Build.SourcesDirectory)/src/ui
+      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/output/ui
       includeRootFolder: false
       archiveFile: "$(System.ArtifactsDirectory)/output/Cyjack.UI.zip"
   
