@@ -77,6 +77,6 @@ steps:
         includeRootFolder: false
         archiveFile: "$(System.ArtifactsDirectory)/output/${{ project }}.zip"
 
-    - publish: '$(System.ArtifactsDirectory)/output/${{ project }}.zip'
-      displayName: 'Publish - Function App'
-      artifact: 'drop'
+  - publish: '$(System.ArtifactsDirectory)/output/**'
+    displayName: 'Publish'
+    artifact: 'drop'
