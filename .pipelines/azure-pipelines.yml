@@ -6,7 +6,7 @@ pr:
  - 'develop'
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 stages:
 
@@ -31,3 +31,4 @@ stages:
         - template: 'steps/ci.yml'
           parameters:
             configuration: Release
+            projects: ['Cyjack.Functions', 'Cyjack.Web']
