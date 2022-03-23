@@ -15,12 +15,12 @@ steps:
   - script: 
       npm install
     displayName: 'npm install'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
 
   - script: 
       npm run build
     displayName: 'npm build'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
 
   - task: UseDotNet@2
     displayName: 'Use .NET Core 6.0.x'
