@@ -5,11 +5,6 @@
 * MicroSD Card
 * Ethernet Cable
 
-### Dependencies
-* Visual Studio 2019 / 2022
-  * Workload: Universal Windows Platform development
-* [Windows 10 IoT Core Dashboard](https://docs.microsoft.com/en-us/windows/iot-core/connect-your-device/iotdashboard)
-
 ### Setup
 
 #### Install OS and Connect to Pi via SSH
@@ -39,8 +34,9 @@ sudo a2enmod ssl
 sudo a2dissite 000-default.conf
 
 sudo nano /etc/apache2/sites-available/webnixfile.conf
-
-##
+```
+Copy and paste the following, then close and save by clicking `ctrl + x`
+```
 <VirtualHost *:80>
    ServerName www.example.COM
    ProxyPreserveHost On
@@ -53,8 +49,9 @@ sudo nano /etc/apache2/sites-available/webnixfile.conf
    ErrorLog ${APACHE_LOG_DIR}/error-webnix.com.log
    CustomLog ${APACHE_LOG_DIR}/access-webnix.com.log combined
 </VirtualHost>
-###
+```
 
+```
 sudo a2ensite webnixfile.conf
 sudo systemctl restart apache2
 
@@ -62,5 +59,4 @@ https://tutexchange.com/how-to-host-asp-net-core-app-on-ubuntu-with-apache-webse
 ```
 
 ### Endpoints
-* API: http://{ipAddress}:5000/api
-* UI: http://{ipAddress}:5000/ui
+* API: http://{ipAddress}/swagger

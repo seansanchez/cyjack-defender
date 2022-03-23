@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Cyjack.Functions": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "KeyVaultUri": "https://cyjack-ppe.vault.azure.net"
+      }
+    }
+  }
+}

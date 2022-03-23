@@ -1,0 +1,55 @@
+parameters:
+  - name: armDeploymentSubscription
+    type: string
+  - name: armDeploymentResourceGroup
+    type: string
+  - name: armDeploymentLocation
+    type: string
+  - name: configurationName
+    type: string
+  - name: functionAppName
+    type: string
+  - name: uiAppName
+    type: string
+
+steps:
+  - checkout: self
+    submodules: recursive
+
+  - download: current
+    displayName: 'Download - Buildout Artifacts'
+    artifact: 'buildout'
+
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'ARM Template Deployment'
+    inputs:
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
+      resourceGroupName: '${{ parameters.armDeploymentResourceGroup }}'
+      location: '${{ parameters.armDeploymentLocation }}'
+      csmFile: '$(Pipeline.Workspace)/buildout/global/arm/templates/deployment-template.json'
+      csmParametersFile: '$(Pipeline.Workspace)/buildout/global/arm/parameters/${{ parameters.configurationName }}._deployment-parameters.json'
+      deploymentMode: 'Incremental'
+      deploymentOutputs: 'ArmOutputs'
+
+  - pwsh: $(Build.SourcesDirectory)/.scripts/Sleep.ps1 -seconds 60
+    displayName: 'Sleep 60 seconds'
+
+  - download: current
+    displayName: 'Download - drop'
+    artifact: 'drop'
+
+  - task: AzureFunctionApp@1
+    displayName: 'Deploy Azure Function'
+    inputs:
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
+      appType: 'functionAppLinux'
+      appName: '${{ parameters.functionAppName }}'
+      package: '$(Pipeline.Workspace)/drop/Cyjack.Functions.zip'
+
+  - task: AzureWebApp@1
+    displayName: 'Deploy App Service'
+    inputs:
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
+      appName: '${{ parameters.uiAppName }}'
+      appType: 'webAppLinux'
+      package: '$(Pipeline.Workspace)/drop/Cyjack.UI.zip'

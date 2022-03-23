@@ -1,26 +1,39 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Cyjack.Extensions;
+using Cyjack.Functions.Services;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace cyjack_defender
+namespace Cyjack.Functions
 {
-    public static class cyjackDefender
+    public class DeviceSecurityAlertFunctions
     {
-        [FunctionName("cyjack-defender")]
-        public static async Task Run([EventHubTrigger("cyjack-defender", Connection = "AzureEventHubConnectionString")] EventData[] events, ILogger log)
+        private readonly IIoTServiceClientService _ioTServiceClientService;
+        private readonly ILogger<DeviceSecurityAlertFunctions> _logger;
+
+        public DeviceSecurityAlertFunctions(
+            IIoTServiceClientService ioTServiceClientService,
+            ILogger<DeviceSecurityAlertFunctions> logger)
+        {
+            ioTServiceClientService.ShouldNotBeNull(nameof(ioTServiceClientService));
+            logger.ShouldNotBeNull(nameof(logger));
+
+            _ioTServiceClientService = ioTServiceClientService;
+            _logger = logger;
+        }
+
+        [FunctionName("DeviceSecurityAlertFunctions")]
+        public async Task Run(
+            [EventHubTrigger("cyjack-defender/am-securityalert", Connection = "AzureEventHubConnectionString")] EventData[] events,
+            ILogger log)
         {
             var exceptions = new List<Exception>();
 
-            foreach (EventData eventData in events)
+            foreach (var eventData in events)
             {
                 try
                 {
-                    string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
+                    var messageBody = eventData.Body.ToString();
 
                     // Replace these two lines with your processing logic.
                     log.LogInformation($"C# Event Hub trigger function processed a message: {messageBody}");

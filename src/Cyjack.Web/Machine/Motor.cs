@@ -1,6 +1,6 @@
 ﻿using System.Device.Gpio;
 
-namespace RP.Web
+namespace Cyjack.Web.Machine
 {
     public class Motor : IDisposable
     {
@@ -24,6 +24,11 @@ namespace RP.Web
             _gpio.Write(_forwardPin, PinValue.Low);
         }
 
+        public PinValue GetForwardValue()
+        {
+            return _gpio.Read(_forwardPin);
+        }
+
         public void Forward()
         {
             this.Off();
@@ -36,6 +41,11 @@ namespace RP.Web
             this.Off();
 
             _gpio.Write(_backwardPin, PinValue.High);
+        }
+
+        public PinValue GetBackwardValue()
+        {
+            return _gpio.Read(_backwardPin);
         }
 
         public void Dispose()
