@@ -1,6 +1,6 @@
-using Azure.Messaging.EventHubs;
 using Cyjack.Extensions;
 using Cyjack.Functions.Services;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
