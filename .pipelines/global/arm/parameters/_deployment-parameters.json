@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceName": {
-      "value": "fenix-@@Environment@@"
+      "value": "cyjack-@@Environment@@"
     },
     "environment": {
       "value": "@@Environment@@"
