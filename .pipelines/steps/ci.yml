@@ -43,14 +43,14 @@ steps:
     displayName: 'dotnet restore'
     inputs:
       command: restore
-      projects: '**/*.sln'
+      projects: '**/CyjackDefender.sln'
       feedsToUse: 'config'
       nugetConfigPath: '.nuget/nuget.config'
 
   - task: DotNetCoreCLI@2
     displayName: 'dotnet build'
     inputs:
-      projects: '**/*.sln'
+      projects: '**/CyjackDefender.sln'
       arguments: '--configuration ${{ parameters.configuration }} --no-incremental --no-restore'
 
   - ${{ each project in parameters.projects }}:
