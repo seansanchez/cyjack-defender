@@ -4,7 +4,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "KeyVaultUri": "https://cyjack-defender.vault.azure.net"
+        "KeyVaultUri": "https://cyjack-ppe.vault.azure.net"
       }
     }
   }
