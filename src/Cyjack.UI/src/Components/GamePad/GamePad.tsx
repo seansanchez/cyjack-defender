@@ -252,18 +252,26 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
 
     private trackKeyboard(ev: KeyboardEvent, up?: boolean) {
         switch (ev.key) {
+            case ('w'):
+            case ('W'):
             case ('up'):
             case ('ArrowUp'):
                 this.upKey = !up;
                 break;
+            case ('s'):
+            case ('S'):
             case ('down'):
             case ('ArrowDown'):
                 this.downKey = !up;
                 break;
+            case ('a'):
+            case ('A'):
             case ('left'):
             case ('ArrowLeft'):
                 this.leftKey = !up;
                 break;
+            case ('d'):
+            case ('D'):
             case ('right'):
             case ('ArrowRight'):
                 this.rightKey = !up;
