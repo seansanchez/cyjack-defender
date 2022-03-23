@@ -51,5 +51,5 @@ steps:
     inputs:
       azureSubscription: '${{ parameters.armDeploymentSubscription }}'
       appName: '${{ parameters.uiAppName }}'
-      appType: 'webApp'
+      appType: 'webAppLinux'
       package: '$(Pipeline.Workspace)/drop/Cyjack.UI.zip'
