@@ -29,7 +29,7 @@ steps:
       includeRootFolder: false
       archiveFile: "$(System.ArtifactsDirectory)/output/Cyjack.UI.zip"
   
-  - publish: '$(System.ArtifactsDirectory)/output/${{ project }}.zip'
+  - publish: '$(System.ArtifactsDirectory)/output/Cyjack.UI.zip'
     displayName: 'Publish - Function App'
     artifact: 'drop'
 
