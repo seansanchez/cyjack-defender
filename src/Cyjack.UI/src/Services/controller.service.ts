@@ -7,8 +7,7 @@ const ApiAddressKey = 'ApiAddress';
 const inputMappingsKey = 'InputMappings';
 
 export async function CheckApiAlive(ipAddress: string) {
-    const apiUrl = ipAddress.replace('https://', '');
-    const response: AxiosResponse = await axios.get(`${apiUrl}/api/Gpio/Alive`,
+    const response: AxiosResponse = await axios.get(`${ipAddress}/api/Gpio/Alive`,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
@@ -16,8 +15,7 @@ export async function CheckApiAlive(ipAddress: string) {
 }
 
 export async function SendControllerCommands(ipAddress: string, controllerState: IControllerState) {
-    const apiUrl = ipAddress.replace('https://', '');
-    const response: AxiosResponse = await axios.post(`${apiUrl}/api/Gpio/ControllerState`,
+    const response: AxiosResponse = await axios.post(`${ipAddress}/api/Gpio/ControllerState`,
         controllerState,
         { headers: { 'Content-Type': 'application/json' } }
     );
