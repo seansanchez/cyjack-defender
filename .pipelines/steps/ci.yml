@@ -75,8 +75,8 @@ steps:
       inputs:
         rootFolderOrFile: output/${{ project }}
         includeRootFolder: false
-        archiveFile: "$(System.ArtifactsDirectory)/output/${{ project }}.zip"
+        archiveFile: "$(System.ArtifactsDirectory)/drop/${{ project }}.zip"
 
-  - publish: '$(System.ArtifactsDirectory)/output/**'
-    displayName: 'Publish'
+  - publish: '$(System.ArtifactsDirectory)/drop'
+    displayName: 'Publish - drop'
     artifact: 'drop'

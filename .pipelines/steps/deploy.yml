@@ -1,0 +1,15 @@
+steps:
+  - checkout: self
+    submodules: recursive
+
+  - download: current
+    displayName: 'Download - drop'
+    artifact: 'drop'
+
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: 'VSE-150'
+      appType: 'functionAppLinux'
+      appName: 'cyjack-defender'
+      package: '$(Pipeline.Workspace)/drop/Cyjack.Functions.zip'
+    displayName: Deploy Azure Function

@@ -32,3 +32,17 @@ stages:
           parameters:
             configuration: Release
             projects: ['Cyjack.Functions', 'Cyjack.Web']
+
+- stage: Release_PPE
+  displayName: '[PPE] Release'
+  dependsOn: CI_Build
+  condition: and(eq(dependencies.CI_Build.result, 'Succeeded'), ne(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+
+    - deployment: Release_Global
+      displayName: 'Global'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - template: 'steps/deploy.yml'
