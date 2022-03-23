@@ -31,15 +31,15 @@ steps:
       deploymentMode: 'Incremental'
       deploymentOutputs: 'ArmOutputs'
 
-  - pwsh: $(Build.SourcesDirectory)/.scripts/Sleep.ps1 -seconds 30
-    displayName: 'Sleep 30 seconds'
+  - pwsh: $(Build.SourcesDirectory)/.scripts/Sleep.ps1 -seconds 60
+    displayName: 'Sleep 60 seconds'
 
   - download: current
     displayName: 'Download - drop'
     artifact: 'drop'
 
   - task: AzureFunctionApp@1
-    displayName: Deploy Azure Function
+    displayName: 'Deploy Azure Function'
     inputs:
       azureSubscription: '${{ parameters.armDeploymentSubscription }}'
       appType: 'functionAppLinux'
