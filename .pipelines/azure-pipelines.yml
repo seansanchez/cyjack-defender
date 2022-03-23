@@ -41,6 +41,7 @@ stages:
 
     - deployment: Release_Global
       displayName: 'Global'
+      environment: cyjack-defender
       strategy:
         runOnce:
           deploy:
