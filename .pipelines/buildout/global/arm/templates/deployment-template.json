@@ -73,7 +73,7 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2018-11-01",
-      "name": "[parameters('resourceName')]",
+      "name": "[variables('functionsResourceName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', parameters('resourceName'))]",
