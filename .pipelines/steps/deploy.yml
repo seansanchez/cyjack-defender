@@ -39,17 +39,17 @@ steps:
     artifact: 'drop'
 
   - task: AzureFunctionApp@1
+    displayName: Deploy Azure Function
     inputs:
       azureSubscription: '${{ parameters.armDeploymentSubscription }}'
       appType: 'functionAppLinux'
       appName: '${{ parameters.functionAppName }}'
       package: '$(Pipeline.Workspace)/drop/Cyjack.Functions.zip'
-    displayName: Deploy Azure Function
 
   - task: AzureWebApp@1
-    displayName: 'Deploy to App Service'
+    displayName: 'Deploy App Service'
     inputs:
-      azureSubscription: '$(serviceConnection)'
+      azureSubscription: '${{ parameters.armDeploymentSubscription }}'
       appName: '${{ parameters.uiAppName }}'
       appType: 'webApp'
       package: '$(Pipeline.Workspace)/drop/Cyjack.UI.zip'
