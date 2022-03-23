@@ -20,6 +20,8 @@ interface IGamePadState {
     gamepadId: string | null;
     controllerState: IControllerState;
     prevControllerState: IControllerState;
+    invertUpDown: boolean;
+    invertLeftRight: boolean;
 }
 
 export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
@@ -50,7 +52,9 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                 upDown: 0,
                 leftRight: 0,
                 brake: false
-            }
+            },
+            invertLeftRight: false,
+            invertUpDown: false
         };
     }
 
@@ -85,8 +89,8 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             prevControllerState: currState
                         });
                         SendControllerCommands(this.props.apiAddress, {
-                            upDown: Math.round(currState.upDown),
-                            leftRight: Math.round(currState.leftRight),
+                            upDown: Math.round(currState.upDown * (this.state.invertUpDown ? -1 : 1)),
+                            leftRight: Math.round(currState.leftRight * (this.state.invertLeftRight ? -1 : 1)),
                             brake: currState.brake
                         }).then(() => null).catch(ex => {
                             console.error(ex);
@@ -346,6 +350,21 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     render() {
         return (
             <div className='GamePad' onContextMenu={(ev) => this.preventContextMenu(ev)}>
+                <button
+                    className='InvertVertButton'
+                    style={this.state.invertUpDown ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
+                    onClick={() => this.setState({
+                        invertUpDown: !this.state.invertUpDown
+                    })}>
+                    <div className='InnerTextWrapper'>
+                        <span className='Label'>
+                            Invert Y-Axis
+                        </span>
+                        <span className='InvertedYesNo'>
+                            {this.state.invertUpDown ? 'yes' : 'no'}
+                        </span>
+                    </div>
+                </button>
                 <div className='LeftPad'
                     onPointerDown={(ev) => this.trackVertPointer(ev)}
                     onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
@@ -360,6 +379,21 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             animate={{ y: this.state.controllerState.upDown * -0.8 }} />
                     </div>
                 </div>
+                <button
+                    className='InvertHorizButton'
+                    style={this.state.invertLeftRight ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
+                    onClick={() => this.setState({
+                        invertLeftRight: !this.state.invertLeftRight
+                    })}>
+                    <div className='InnerTextWrapper'>
+                        <span className='Label'>
+                            Invert X-Axis
+                        </span>
+                        <span className='InvertedYesNo'>
+                            {this.state.invertLeftRight ? 'yes' : 'no'}
+                        </span>
+                    </div>
+                </button>
                 <div className='RightPad'
                     onPointerDown={(ev) => this.trackHorizPointer(ev)}
                     onPointerCancel={(ev) => this.trackHorizPointer(ev, true)}
