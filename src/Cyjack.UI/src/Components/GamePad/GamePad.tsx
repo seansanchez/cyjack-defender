@@ -8,7 +8,7 @@ import { IInputMapping, InputType } from '../../Models/IInputMapping';
 import { SendControllerCommands } from '../../Services/controller.service';
 
 interface IGamePadProps {
-    apiUrl: string;
+    apiAddress: string;
     apiAlive: boolean;
     checkingApiAlive: boolean;
     inputMapping: IInputMapping;
@@ -74,9 +74,9 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                         this.setState({
                             prevControllerState: currState
                         });
-                        SendControllerCommands(this.props.apiUrl, {
-                            upDown: currState.upDown,
-                            leftRight: currState.leftRight,
+                        SendControllerCommands(this.props.apiAddress, {
+                            upDown: Math.round(currState.upDown),
+                            leftRight: Math.round(currState.leftRight),
                             brake: currState.brake
                         }).then(() => null).catch(ex => {
                             console.error(ex);

@@ -3,19 +3,21 @@ import axios, { AxiosResponse } from 'axios';
 import { IControllerState } from '../Models/IControllerState';
 import { IInputMapping, InputType } from '../Models/IInputMapping';
 
-const ApiUrlKey = 'ApiUrl';
+const ApiAddressKey = 'ApiAddress';
 const inputMappingsKey = 'InputMappings';
 
-export async function CheckApiAlive(apiUrl: string) {
-    const response: AxiosResponse = await axios.get(`${apiUrl}/Gpio/Alive`,
+export async function CheckApiAlive(ipAddress: string) {
+    const apiUrl = ipAddress.replace('https://', '');
+    const response: AxiosResponse = await axios.get(`${apiUrl}/api/Gpio/Alive`,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
     return response.data;
 }
 
-export async function SendControllerCommands(apiUrl: string, controllerState: IControllerState) {
-    const response: AxiosResponse = await axios.post(`${apiUrl}/Gpio/ControllerState`,
+export async function SendControllerCommands(ipAddress: string, controllerState: IControllerState) {
+    const apiUrl = ipAddress.replace('https://', '');
+    const response: AxiosResponse = await axios.post(`${apiUrl}/api/Gpio/ControllerState`,
         controllerState,
         { headers: { 'Content-Type': 'application/json' } }
     );
@@ -23,13 +25,13 @@ export async function SendControllerCommands(apiUrl: string, controllerState: IC
     return response.data;
 }
 
-export function SaveLastApiUrl(apiUrl: string) {
-    localStorage.setItem(ApiUrlKey, apiUrl);
+export function SaveLastApiAddress(apiAddress: string) {
+    localStorage.setItem(ApiAddressKey, apiAddress);
 }
 
-export function GetLastApiUrl(): string {
-    const apiUrl = localStorage.getItem(ApiUrlKey);
-    return apiUrl ? apiUrl : 'http://localhost:80/api';
+export function GetLastApiAddress(): string {
+    const apiAddress = localStorage.getItem(ApiAddressKey);
+    return apiAddress ? apiAddress : '192.168.0.38';
 }
 
 export function SaveLastInput(inputMapping: IInputMapping) {
