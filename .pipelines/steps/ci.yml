@@ -22,6 +22,17 @@ steps:
     displayName: 'npm build'
     workingDirectory: $(Build.SourcesDirectory)/src/Cyjack.UI
 
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: src/ui
+      includeRootFolder: false
+      archiveFile: "$(System.ArtifactsDirectory)/output/Cyjack.UI.zip"
+  
+  - publish: '$(System.ArtifactsDirectory)/output/${{ project }}.zip'
+    displayName: 'Publish - Function App'
+    artifact: 'drop'
+
   - task: UseDotNet@2
     displayName: 'Use .NET Core 6.0.x'
     inputs:
