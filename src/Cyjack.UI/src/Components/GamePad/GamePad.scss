@@ -21,6 +21,56 @@
     -webkit-touch-callout: none;
 }
 
+.InvertVertButton,
+.InvertHorizButton {
+    position: absolute;
+    bottom: 14.5rem;
+    color: white;
+    border: none;
+    height: 4rem;
+    width: 4rem;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+
+    .InnerTextWrapper {
+        position: relative;
+        height: 100%;
+        width: 100%;
+
+        .Label {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            font-size: 14px;
+            user-select: none;
+            height: 2.5rem;
+        }
+
+        .InvertedYesNo {
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0;
+            right: 0;
+            margin: auto;
+            font-size: 10px;
+            user-select: none;
+        }
+    }
+}
+
+.InvertVertButton {
+    left: 8rem;
+}
+
+.InvertHorizButton {
+    right: 8rem;
+}
+
 .LeftPad {
     position: absolute;
     left: 0rem;

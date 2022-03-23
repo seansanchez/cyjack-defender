@@ -116,7 +116,7 @@
       "properties": {
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('resourceName'))]",
-        "httpsOnly": true
+        "httpsOnly": false
       }
     },
     {

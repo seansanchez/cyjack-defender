@@ -20,9 +20,17 @@ interface IGamePadState {
     gamepadId: string | null;
     controllerState: IControllerState;
     prevControllerState: IControllerState;
+    invertUpDown: boolean;
+    invertLeftRight: boolean;
 }
 
 export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
+
+    private upKey = false;
+    private downKey = false;
+    private leftKey = false;
+    private rightKey = false;
+    private spaceKey = false;
 
     private gamepadInterval: NodeJS.Timer | null = null;
 
@@ -44,13 +52,17 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                 upDown: 0,
                 leftRight: 0,
                 brake: false
-            }
+            },
+            invertLeftRight: false,
+            invertUpDown: false
         };
     }
 
     componentDidMount() {
         window.addEventListener('gamepadconnected', (e) => this.handleGamepadConnected(e));
         window.addEventListener('gamepaddisconnected', (e) => this.handleGamepadDisconnected(e));
+        window.addEventListener('keydown', (e) => this.trackKeyboard(e));
+        window.addEventListener('keyup', (e) => this.trackKeyboard(e, true));
         this.startGamepadInterval();
         this.startApiThrottler();
     }
@@ -58,6 +70,8 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     componentWillUnmount() {
         window.removeEventListener('gamepadconnected', this.handleGamepadConnected);
         window.removeEventListener('gamepaddisconnected', this.handleGamepadConnected);
+        window.removeEventListener('keydown', (e) => this.trackKeyboard(e));
+        window.removeEventListener('keyup', (e) => this.trackKeyboard(e, true));
         this.stopGamepadInterval();
         this.stopApiThrotther();
     }
@@ -75,8 +89,8 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             prevControllerState: currState
                         });
                         SendControllerCommands(this.props.apiAddress, {
-                            upDown: Math.round(currState.upDown),
-                            leftRight: Math.round(currState.leftRight),
+                            upDown: Math.round(currState.upDown * (this.state.invertUpDown ? -1 : 1)),
+                            leftRight: Math.round(currState.leftRight * (this.state.invertLeftRight ? -1 : 1)),
                             brake: currState.brake
                         }).then(() => null).catch(ex => {
                             console.error(ex);
@@ -240,19 +254,60 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
         }
     }
 
+    private trackKeyboard(ev: KeyboardEvent, up?: boolean) {
+        switch (ev.key) {
+            case ('w'):
+            case ('W'):
+            case ('up'):
+            case ('ArrowUp'):
+                this.upKey = !up;
+                break;
+            case ('s'):
+            case ('S'):
+            case ('down'):
+            case ('ArrowDown'):
+                this.downKey = !up;
+                break;
+            case ('a'):
+            case ('A'):
+            case ('left'):
+            case ('ArrowLeft'):
+                this.leftKey = !up;
+                break;
+            case ('d'):
+            case ('D'):
+            case ('right'):
+            case ('ArrowRight'):
+                this.rightKey = !up;
+                break;
+            case ('space'):
+            case (' '):
+                this.spaceKey = !up;
+                break;
+            default:
+                break;
+        }
+        const upDown = (this.upKey ? 100 : 0) + (this.downKey ? -100 : 0);
+        const leftRight = (this.rightKey ? 100 : 0) + (this.leftKey ? -100 : 0);
+        const brake = this.spaceKey;
+        this.updateControllerState(upDown, leftRight, brake);
+    }
+
     private trackVertPointer(ev: React.PointerEvent, reset?: boolean) {
         if (reset) {
             this.updateControllerState(0, this.state.controllerState.leftRight, this.state.controllerState.brake);
             return;
         }
-        const padBoundingRect = ev.currentTarget.getBoundingClientRect();
-        let upDown = (padBoundingRect.height / 2) - (ev.pageY - padBoundingRect.y);
-        if (upDown < 0) {
-            upDown = Math.max(upDown, -100);
-        } else if (upDown > 0) {
-            upDown = Math.min(upDown, 100);
+        if (ev.pointerType === 'touch') {
+            const padBoundingRect = ev.currentTarget.getBoundingClientRect();
+            let upDown = (padBoundingRect.height / 2) - (ev.pageY - padBoundingRect.y);
+            if (upDown < 0) {
+                upDown = Math.max(upDown, -100);
+            } else if (upDown > 0) {
+                upDown = Math.min(upDown, 100);
+            }
+            this.updateControllerState(upDown, this.state.controllerState.leftRight, this.state.controllerState.brake);
         }
-        this.updateControllerState(upDown, this.state.controllerState.leftRight, this.state.controllerState.brake);
     }
 
     private trackHorizPointer(ev: React.PointerEvent, reset?: boolean) {
@@ -260,14 +315,16 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
             this.updateControllerState(this.state.controllerState.upDown, 0, this.state.controllerState.brake);
             return;
         }
-        const padBoundingRect = ev.currentTarget.getBoundingClientRect();
-        let leftRight = (padBoundingRect.width / 2) - (ev.pageX - padBoundingRect.x);
-        if (leftRight < 0) {
-            leftRight = Math.max(leftRight, -100) * -1;
-        } else if (leftRight > 0) {
-            leftRight = Math.min(leftRight, 100) * -1;
+        if (ev.pointerType === 'touch') {
+            const padBoundingRect = ev.currentTarget.getBoundingClientRect();
+            let leftRight = (padBoundingRect.width / 2) - (ev.pageX - padBoundingRect.x);
+            if (leftRight < 0) {
+                leftRight = Math.max(leftRight, -100) * -1;
+            } else if (leftRight > 0) {
+                leftRight = Math.min(leftRight, 100) * -1;
+            }
+            this.updateControllerState(this.state.controllerState.upDown, leftRight, this.state.controllerState.brake);
         }
-        this.updateControllerState(this.state.controllerState.upDown, leftRight, this.state.controllerState.brake);
     }
 
     private updateBrake(brake: boolean) {
@@ -293,6 +350,21 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     render() {
         return (
             <div className='GamePad' onContextMenu={(ev) => this.preventContextMenu(ev)}>
+                <button
+                    className='InvertVertButton'
+                    style={this.state.invertUpDown ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
+                    onClick={() => this.setState({
+                        invertUpDown: !this.state.invertUpDown
+                    })}>
+                    <div className='InnerTextWrapper'>
+                        <span className='Label'>
+                            Invert Y-Axis
+                        </span>
+                        <span className='InvertedYesNo'>
+                            {this.state.invertUpDown ? 'yes' : 'no'}
+                        </span>
+                    </div>
+                </button>
                 <div className='LeftPad'
                     onPointerDown={(ev) => this.trackVertPointer(ev)}
                     onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
@@ -307,6 +379,21 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             animate={{ y: this.state.controllerState.upDown * -0.8 }} />
                     </div>
                 </div>
+                <button
+                    className='InvertHorizButton'
+                    style={this.state.invertLeftRight ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
+                    onClick={() => this.setState({
+                        invertLeftRight: !this.state.invertLeftRight
+                    })}>
+                    <div className='InnerTextWrapper'>
+                        <span className='Label'>
+                            Invert X-Axis
+                        </span>
+                        <span className='InvertedYesNo'>
+                            {this.state.invertLeftRight ? 'yes' : 'no'}
+                        </span>
+                    </div>
+                </button>
                 <div className='RightPad'
                     onPointerDown={(ev) => this.trackHorizPointer(ev)}
                     onPointerCancel={(ev) => this.trackHorizPointer(ev, true)}
