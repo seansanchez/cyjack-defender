@@ -2,9 +2,6 @@ parameters:
   - name: configuration
 
 steps:
-  - checkout: self
-    submodules: recursive
-
   - task: NodeTool@0
     inputs:
       versionSpec: '12.x'
@@ -13,9 +10,29 @@ steps:
   - script: 
       npm install
     displayName: 'npm install'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: src/Cyjack.UI
 
   - script: 
       npm run build
     displayName: 'npm build'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: src/Cyjack.UI
+
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 6.0.x'
+    inputs:
+      packageType: 'sdk'
+      version: 6.0.x
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      projects: '**/CyjackDefender.sln'
+      feedsToUse: 'config'
+      nugetConfigPath: '.nuget/nuget.config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: '**/CyjackDefender.sln'
+      arguments: '--configuration ${{ parameters.configuration }} --no-incremental --no-restore'

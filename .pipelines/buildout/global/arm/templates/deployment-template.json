@@ -60,9 +60,9 @@
       "name": "[parameters('resourceName')]",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "B1",
+        "name": "B2",
         "tier": "Basic",
-        "size": "B1",
+        "size": "B2",
         "family": "B",
         "capacity": 1
       },
