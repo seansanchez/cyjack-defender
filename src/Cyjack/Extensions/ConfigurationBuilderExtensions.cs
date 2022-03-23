@@ -21,6 +21,7 @@ namespace Cyjack.Extensions
 
             source.AddEnvironmentVariables();
             source.AddJsonConfigurationProvider(applicationRootPath);
+            source.AddAzureKeyVaultConfigurationProvider();
         }
 
         private static void AddJsonConfigurationProvider(
