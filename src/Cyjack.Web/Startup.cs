@@ -66,6 +66,7 @@ namespace Cyjack.Web
                 .UseStaticFiles()
                 .UseWebSockets()
                 .UseRouting()
+                .UseCors(app => app.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {
