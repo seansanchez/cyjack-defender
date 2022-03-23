@@ -76,7 +76,6 @@
       "name": "[parameters('resourceName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', parameters('resourceName'))]",
         "[resourceId('Microsoft.Web/serverfarms', parameters('resourceName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('resourceNameWithoutHyphens'))]"
       ],
@@ -109,7 +108,7 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "2021-03-01",
       "name": "[variables('uiResourceName')]",
-      "location": "West US",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', parameters('resourceName'))]"
       ],
