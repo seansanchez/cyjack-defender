@@ -1,4 +1,3 @@
-using System.Text;
 using Azure.Messaging.EventHubs;
 using Cyjack.Extensions;
 using Cyjack.Functions.Services;
@@ -23,7 +22,6 @@ namespace Cyjack.Functions
             _logger = logger;
         }
 
-        [Disable]
         [FunctionName("DeviceSecurityAlertFunctions")]
         public async Task Run(
             [EventHubTrigger("cyjack-defender/am-securityalert", Connection = "AzureEventHubConnectionString")] EventData[] events,
