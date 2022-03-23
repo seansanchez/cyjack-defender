@@ -49,7 +49,7 @@ stages:
               - template: 'steps/deploy.yml'
                 parameters:
                   armDeploymentSubscription: 'VSE-150'
-                  armDeploymentResourceGroup: 'fenix-ppe'
-                  armDeploymentLocation: 'WestUS2'
+                  armDeploymentResourceGroup: 'cyjack-ppe'
+                  armDeploymentLocation: 'WestUS'
                   configurationName: 'ppe'
                   functionAppName: 'cyjack-ppe-fa'
