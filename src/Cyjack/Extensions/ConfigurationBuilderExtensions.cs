@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace Cyjack.Extensions
 {
@@ -20,6 +21,7 @@ namespace Cyjack.Extensions
 
             source.AddEnvironmentVariables();
             source.AddJsonConfigurationProvider(applicationRootPath);
+            source.AddAzureKeyVaultConfigurationProvider();
         }
 
         private static void AddJsonConfigurationProvider(
@@ -36,7 +38,7 @@ namespace Cyjack.Extensions
                     optional: true,
                     reloadOnChange: false);
 
-            var environment = Environment.GetEnvironmentVariable(CyjackConstants.EnvironmentSettings.Environment);
+            var environment = Environment.GetEnvironmentVariable(Constants.EnvironmentSettings.Environment);
 
             if (!string.IsNullOrWhiteSpace(environment))
             {
@@ -47,6 +49,20 @@ namespace Cyjack.Extensions
                         path: applicationRootPath == null ? appSettingsWithEnvironmentFileName : Path.Combine(applicationRootPath, appSettingsWithEnvironmentFileName),
                         optional: true,
                         reloadOnChange: false);
+            }
+        }
+
+        private static void AddAzureKeyVaultConfigurationProvider(this IConfigurationBuilder source)
+        {
+            source.ShouldNotBeNull(nameof(source));
+
+            var keyVaultUri = Environment.GetEnvironmentVariable(Constants.EnvironmentSettings.KeyVaultUri);
+
+            if (!string.IsNullOrWhiteSpace(keyVaultUri))
+            {
+                var environment = Environment.GetEnvironmentVariable(Constants.EnvironmentSettings.Environment);
+
+                source.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
             }
         }
     }

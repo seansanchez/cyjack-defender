@@ -2,7 +2,7 @@
 {
     public static class StringExtensions
     {
-        public static void ShouldNotBeNullOrEmpty(string source, string name)
+        public static void ShouldNotBeNullOrEmpty(this string source, string name)
         {
             if (string.IsNullOrEmpty(source))
             {
@@ -10,7 +10,7 @@
             }
         }
 
-        public static void ShouldNotBeNullOrWhitespace(string source, string name)
+        public static void ShouldNotBeNullOrWhiteSpace(this string source, string name)
         {
             if (string.IsNullOrWhiteSpace(source))
             {

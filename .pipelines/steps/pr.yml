@@ -2,9 +2,6 @@ parameters:
   - name: configuration
 
 steps:
-  - checkout: self
-    submodules: recursive
-
   - task: NodeTool@0
     inputs:
       versionSpec: '12.x'
@@ -13,22 +10,29 @@ steps:
   - script: 
       npm install
     displayName: 'npm install'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: src/Cyjack.UI
 
   - script: 
       npm run build
     displayName: 'npm build'
-    workingDirectory: $(Build.SourcesDirectory)\src\Cyjack.UI
+    workingDirectory: src/Cyjack.UI
 
-  - task: NuGetToolInstaller@1
-  
-  - task: NuGetCommand@2
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 6.0.x'
     inputs:
-      restoreSolution: '**/CyjackDefender.sln'
-  
-  - task: VSBuild@1
+      packageType: 'sdk'
+      version: 6.0.x
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
     inputs:
-      platform: 'ARM'
-      solution: '**/CyjackDefender.sln'
-      configuration: '${{ parameters.configuration }}'
-      msbuildArgs: '/p:AppxBundlePlatforms=ARM /p:AppxPackageDir="$(build.artifactStagingDirectory)\AppxPackages\\" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+      command: restore
+      projects: '**/CyjackDefender.sln'
+      feedsToUse: 'config'
+      nugetConfigPath: '.nuget/nuget.config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: '**/CyjackDefender.sln'
+      arguments: '--configuration ${{ parameters.configuration }} --no-incremental --no-restore'
