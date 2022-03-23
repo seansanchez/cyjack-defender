@@ -53,3 +53,4 @@ stages:
                   armDeploymentLocation: 'WestUS'
                   configurationName: 'ppe'
                   functionAppName: 'cyjack-ppe-fa'
+                  uiAppName: 'cyjack-ppe-ui'

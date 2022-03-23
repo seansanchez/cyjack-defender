@@ -9,6 +9,8 @@ parameters:
     type: string
   - name: functionAppName
     type: string
+  - name: uiAppName
+    type: string
 
 steps:
   - checkout: self
@@ -43,3 +45,11 @@ steps:
       appName: '${{ parameters.functionAppName }}'
       package: '$(Pipeline.Workspace)/drop/Cyjack.Functions.zip'
     displayName: Deploy Azure Function
+
+  - task: AzureWebApp@1
+    displayName: 'Deploy to App Service'
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      appName: '${{ parameters.uiAppName }}'
+      appType: 'webApp'
+      package: '$(Pipeline.Workspace)/drop/Cyjack.UI.zip'
