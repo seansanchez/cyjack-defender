@@ -2,22 +2,22 @@ import './App.scss';
 
 import React, { useState } from 'react';
 
-import { CheckApiAlive, GetInputMappings, GetLastApiUrl, GetLastInputMapping, SaveLastApiUrl, SaveLastInput as SaveLastInputMapping } from '../Services/controller.service';
+import { CheckApiAlive, GetInputMappings, GetLastApiAddress, GetLastInputMapping, SaveLastApiAddress, SaveLastInput as SaveLastInputMapping } from '../Services/controller.service';
 import { GamePad } from './GamePad/GamePad';
 
 function App() {
-    const [apiUrl, setApiUrl] = useState(GetLastApiUrl());
+    const [apiAddress, setApiAddress] = useState(GetLastApiAddress());
     const [apiAlive, setApiAlive] = useState(false);
     const [checkingApiAlive, setCheckingApiAlive] = useState(false);
     const [inputMapping, setInputMapping] = useState(GetLastInputMapping());
 
     const updateApiUrl = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        const apiUrl = ev.currentTarget.value.trim();
+        const apiAddress = ev.currentTarget.value.trim();
         setCheckingApiAlive(true);
-        setApiUrl(apiUrl);
-        SaveLastApiUrl(apiUrl);
-        if (apiUrl.length > 0 && apiUrl.includes('http://')) {
-            CheckApiAlive(apiUrl).then(() => {
+        setApiAddress(apiAddress);
+        SaveLastApiAddress(apiAddress);
+        if (apiAddress.length > 0) {
+            CheckApiAlive(apiAddress).then(() => {
                 setApiAlive(true);
                 setCheckingApiAlive(false);
             }).catch(() => {
@@ -44,8 +44,8 @@ function App() {
                 </p>
 
                 <div style={{ position: 'relative' }}>
-                    <span className='ApiUrlLabel'>API URL:</span>
-                    <input className='ApiUrlInput' value={apiUrl} onChange={(ev) => updateApiUrl(ev)} />
+                    <span className='ApiUrlLabel'>API IP Address:</span>
+                    <input className='ApiUrlInput' value={apiAddress} onChange={(ev) => updateApiUrl(ev)} />
                 </div>
 
                 <div style={{ position: 'relative', marginTop: '1rem' }}>
@@ -67,7 +67,7 @@ function App() {
                 </div>
             </header>
             <GamePad
-                apiUrl={apiUrl}
+                apiAddress={apiAddress}
                 apiAlive={apiAlive}
                 checkingApiAlive={checkingApiAlive}
                 inputMapping={inputMapping} />
