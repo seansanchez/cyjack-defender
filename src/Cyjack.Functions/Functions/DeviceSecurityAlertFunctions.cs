@@ -1,5 +1,7 @@
+using Cyjack.Enums;
 using Cyjack.Extensions;
 using Cyjack.Functions.Services;
+using Cyjack.Models;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -34,6 +36,12 @@ namespace Cyjack.Functions
                 try
                 {
                     var messageBody = eventData.Body.ToString();
+
+                    var sam = new SecurityActionMessage()
+                    {
+                        Message = "message",
+                        SecurityAction = SecurityActionEnum.Stop
+                    };
 
                     // Replace these two lines with your processing logic.
                     log.LogInformation($"C# Event Hub trigger function processed a message: {messageBody}");
