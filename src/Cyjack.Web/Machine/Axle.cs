@@ -35,6 +35,9 @@ namespace Cyjack.Web.Machine
             if (_leftMotor != null && _rightMotor != null)
             {
                 _motorConnectionState = MotorConnectionState.Connected;
+            } else
+            {
+                _logger.LogError("Error connecting to motors on startup.");
             }
         }
 
