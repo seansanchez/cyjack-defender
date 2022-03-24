@@ -29,7 +29,7 @@ export function SaveLastApiAddress(apiAddress: string) {
 
 export function GetLastApiAddress(): string {
     const apiAddress = localStorage.getItem(ApiAddressKey);
-    return apiAddress ? apiAddress : '192.168.0.38';
+    return apiAddress && apiAddress.length > 0 ? apiAddress : 'http://192.168.0.38';
 }
 
 export function SaveLastInput(inputMapping: IInputMapping) {

@@ -16,19 +16,36 @@
 }
 
 .AppNameLabel {
-  margin-top: 0;
+  margin-top: 1rem;
   font-weight: bold;
 }
 
-.ApiUrlInput {
-  background-color: transparent;
-  border: 2px solid white;
-  border-radius: 8px;
-  padding: 0.25rem;
-  color: white;
-  width: 10rem;
+.ApiAddressWrapper {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
 
-  &.Select {
+  .ApiAddressInput {
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: 0.25rem;
+    color: white;
+    width: 10rem;
+  }
+}
+
+.ControllerMapWrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+
+  .ControllerMapSelect {
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: 0.25rem;
+    color: white;
     width: 11rem;
 
     > Option {
@@ -38,7 +55,7 @@
   }
 }
 
-.ApiUrlLabel {
+.InputLabel {
   position: absolute;
   left: 0.25rem;
   bottom: 80%;
