@@ -107,7 +107,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             if (ex.response.data.status === ApiErrorStatus.SecurityException) {
                                 this.setState({
                                     apiStatus: {
-                                        error: false,
+                                        error: true,
                                         errorMessage: ex.response.data.detail,
                                         recovering: false
                                     }
