@@ -115,8 +115,6 @@ namespace Cyjack.Web.Machine
             if (_motorConnectionState == MotorConnectionState.Connected)
             {
                 _motorConnectionState = MotorConnectionState.SecurityAlertDisconnected;
-                _leftMotor.Off();
-                _rightMotor.Off();
             }
         }
 

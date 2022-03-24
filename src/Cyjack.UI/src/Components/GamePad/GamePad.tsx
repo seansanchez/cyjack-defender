@@ -116,7 +116,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                         });
                     }
                 }
-            }, 500);
+            }, 50);
         }
     }
 
