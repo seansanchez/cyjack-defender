@@ -67,10 +67,10 @@ namespace Cyjack.Web
                             case SecurityActionEnum.None:
                                 break;
                             case SecurityActionEnum.Stop:
-                                _axle.Control(new ControlState()
-                                {
-                                    Brake = true
-                                });
+                                _axle.EmergencyStopForSecurityException();
+                                break;
+                            case SecurityActionEnum.Recover:
+                                _axle.RecoverFromEmergencyStop();
                                 break;
                             default:
                                 break;

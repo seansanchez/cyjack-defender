@@ -2,6 +2,8 @@
 using Cyjack.Web.Machine;
 using Cyjack.Web.Machine.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Security;
 
 namespace Cyjack.Web.Controllers
 {
@@ -27,9 +29,21 @@ namespace Cyjack.Web.Controllers
         [HttpPost("ControllerState")]
         public IActionResult Control(ControlState controlState)
         {
-            this._axle.Control(controlState);
+            try
+            {
+                this._axle.Control(controlState);
 
-            return Ok();
+                return Ok();
+            }
+            catch (IOException ex)
+            {
+                return Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.FailedDependency);
+            }
+            catch (SecurityException ex)
+            {
+                return Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.ServiceUnavailable);
+
+            }
         }
     }
 }
