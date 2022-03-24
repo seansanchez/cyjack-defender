@@ -1,6 +1,8 @@
 using System.Device.Gpio;
+using System.Security;
 using Cyjack.Extensions;
 using Cyjack.Web.Machine.Entities;
+using Cyjack.Web.Machine.Enums;
 using Microsoft.Extensions.Options;
 
 namespace Cyjack.Web.Machine
@@ -10,6 +12,7 @@ namespace Cyjack.Web.Machine
         private readonly ILogger<Axle> _logger;
         private readonly Motor _leftMotor;
         private readonly Motor _rightMotor;
+        private MotorConnectionState _motorConnectionState = MotorConnectionState.NotConnected;
 
         public Axle(
             IOptions<CyjackWebOptions> options,
@@ -28,10 +31,30 @@ namespace Cyjack.Web.Machine
             _rightMotor = new Motor(
                 forwardPin: options.Value.RightForwardPin,
                 backwardPin: options.Value.RightBackwardPin);
+
+            if (_leftMotor != null && _rightMotor != null)
+            {
+                _motorConnectionState = MotorConnectionState.Connected;
+            } else
+            {
+                _logger.LogError("Error connecting to motors on startup.");
+            }
         }
+
 
         public void Control(ControlState controlState)
         {
+            if (_motorConnectionState == MotorConnectionState.NotConnected)
+            {
+                _logger.LogError("Attempt to control motors blocked by issue connecting to motors.");
+                throw new IOException("Motors are not connected.");
+            }
+            else if (_motorConnectionState == MotorConnectionState.SecurityAlertDisconnected)
+            {
+                _logger.LogError("Attempt to control motors blocked by Security Exception.");
+                throw new SecurityException("Motors disconnected due to a security exception");
+            }
+
             if (this.IsStopped(controlState))
             {
                 _leftMotor.Off();
@@ -76,6 +99,24 @@ namespace Cyjack.Web.Machine
             {
                 _leftMotor.Off();
                 _rightMotor.Backward();
+            }
+        }
+        public void RecoverFromEmergencyStop()
+        {
+            if (_motorConnectionState == MotorConnectionState.SecurityAlertDisconnected &&
+                _leftMotor != null && _rightMotor != null)
+            {
+                _motorConnectionState = MotorConnectionState.Connected;
+            }
+        }
+
+        public void EmergencyStopForSecurityException()
+        {
+            if (_motorConnectionState == MotorConnectionState.Connected)
+            {
+                _motorConnectionState = MotorConnectionState.SecurityAlertDisconnected;
+                _leftMotor.Off();
+                _rightMotor.Off();
             }
         }
 

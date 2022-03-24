@@ -6,6 +6,10 @@ namespace Cyjack.Web.Machine
     {
         void Control(ControlState controlState);
 
+        void RecoverFromEmergencyStop();
+
+        void EmergencyStopForSecurityException();
+
         ControlState GetControlState();
     }
 }

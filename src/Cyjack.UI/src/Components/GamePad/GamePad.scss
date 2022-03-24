@@ -24,7 +24,7 @@
 .InvertVertButton,
 .InvertHorizButton {
     position: absolute;
-    bottom: 14.5rem;
+    bottom: 10rem;
     color: white;
     border: none;
     height: 4rem;
@@ -49,6 +49,7 @@
             font-size: 14px;
             user-select: none;
             height: 2.5rem;
+            text-align: center;
         }
 
         .InvertedYesNo {
@@ -64,11 +65,11 @@
 }
 
 .InvertVertButton {
-    left: 8rem;
+    left: 14rem;
 }
 
 .InvertHorizButton {
-    right: 8rem;
+    right: 14rem;
 }
 
 .LeftPad {
