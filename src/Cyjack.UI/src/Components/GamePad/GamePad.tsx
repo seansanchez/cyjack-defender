@@ -3,9 +3,10 @@ import './GamePad.scss';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
+import { ApiErrorStatus, IApiException } from '../../Models/IApiException';
 import { IControllerState } from '../../Models/IControllerState';
 import { IInputMapping, InputType } from '../../Models/IInputMapping';
-import { SendControllerCommands } from '../../Services/controller.service';
+import { RecoverFromSecurityException, SendControllerCommands } from '../../Services/controller.service';
 
 interface IGamePadProps {
     apiAddress: string;
@@ -22,6 +23,11 @@ interface IGamePadState {
     prevControllerState: IControllerState;
     invertUpDown: boolean;
     invertLeftRight: boolean;
+    apiStatus: {
+        error: boolean;
+        errorMessage: string;
+        recovering: boolean;
+    };
 }
 
 export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
@@ -54,7 +60,12 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                 brake: false
             },
             invertLeftRight: false,
-            invertUpDown: false
+            invertUpDown: false,
+            apiStatus: {
+                error: false,
+                errorMessage: '',
+                recovering: false
+            }
         };
     }
 
@@ -79,7 +90,7 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
     private startApiThrottler() {
         if (!this.apiThrottheInterval) {
             this.apiThrottheInterval = setInterval(() => {
-                if (this.props.apiAlive) {
+                if (this.props.apiAlive && !this.state.apiStatus.error) {
                     const prevState = this.state.prevControllerState;
                     const currState = this.state.controllerState;
                     if (currState.upDown !== prevState.upDown ||
@@ -92,8 +103,16 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
                             upDown: Math.round(currState.upDown * (this.state.invertUpDown ? -1 : 1)),
                             leftRight: Math.round(currState.leftRight * (this.state.invertLeftRight ? -1 : 1)),
                             brake: currState.brake
-                        }).then(() => null).catch(ex => {
-                            console.error(ex);
+                        }).then(() => null).catch((ex: IApiException) => {
+                            if (ex.response.data.status === ApiErrorStatus.SecurityException) {
+                                this.setState({
+                                    apiStatus: {
+                                        error: false,
+                                        errorMessage: ex.response.data.detail,
+                                        recovering: false
+                                    }
+                                });
+                            }
                         });
                     }
                 }
@@ -341,6 +360,31 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
         });
     }
 
+    private attemptToRecover() {
+        this.setState({
+            apiStatus: {
+                ...this.state.apiStatus,
+                recovering: true
+            }
+        });
+        RecoverFromSecurityException(this.props.apiAddress).then(() => {
+            this.setState({
+                apiStatus: {
+                    error: false,
+                    errorMessage: '',
+                    recovering: false
+                }
+            });
+        }).catch(() => {
+            this.setState({
+                apiStatus: {
+                    ...this.state.apiStatus,
+                    recovering: false
+                }
+            });
+        })
+    }
+
     private preventContextMenu(ev: React.MouseEvent) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -349,141 +393,159 @@ export class GamePad extends React.Component<IGamePadProps, IGamePadState> {
 
     render() {
         return (
-            <div className='GamePad' onContextMenu={(ev) => this.preventContextMenu(ev)}>
-                <button
-                    className='InvertVertButton'
-                    style={this.state.invertUpDown ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
-                    onClick={() => this.setState({
-                        invertUpDown: !this.state.invertUpDown
-                    })}>
-                    <div className='InnerTextWrapper'>
-                        <span className='Label'>
-                            Invert Y-Axis
-                        </span>
-                        <span className='InvertedYesNo'>
-                            {this.state.invertUpDown ? 'yes' : 'no'}
-                        </span>
-                    </div>
-                </button>
-                <div className='LeftPad'
-                    onPointerDown={(ev) => this.trackVertPointer(ev)}
-                    onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
-                    onPointerUp={(ev) => this.trackVertPointer(ev, true)}
-                    onPointerMove={(ev) => this.trackVertPointer(ev)}
-                    onContextMenu={(ev) => this.preventContextMenu(ev)}>
-                    <div className="VertDragArea">
-                        <motion.div
-                            className='ThumbDrag'
-                            drag={false}
-                            initial={{ y: 0 }}
-                            animate={{ y: this.state.controllerState.upDown * -0.8 }} />
+            this.state.apiStatus.error ? (
+                <div className='ErrorScreen'>
+                    <div className='ErrorMessageWrapper'>
+                        <span className='ErrorTitle'>!!! REMOTE CONTROLS COMPROMISED !!!</span>
+                        <br />
+                        <span className='ErrorMessage'>{this.state.apiStatus.errorMessage}</span>
+
+                        <button
+                            className='RecoverButton'
+                            disabled={this.state.apiStatus.recovering}
+                            onClick={() => this.attemptToRecover()}>
+                            Attempt to recover
+                        </button>
                     </div>
                 </div>
-                <button
-                    className='InvertHorizButton'
-                    style={this.state.invertLeftRight ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
-                    onClick={() => this.setState({
-                        invertLeftRight: !this.state.invertLeftRight
-                    })}>
-                    <div className='InnerTextWrapper'>
-                        <span className='Label'>
-                            Invert X-Axis
-                        </span>
-                        <span className='InvertedYesNo'>
-                            {this.state.invertLeftRight ? 'yes' : 'no'}
-                        </span>
+            ) : (
+                <div className='GamePad' onContextMenu={(ev) => this.preventContextMenu(ev)}>
+                    <button
+                        className='InvertVertButton'
+                        style={this.state.invertUpDown ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }
+                        }
+                        onClick={() => this.setState({
+                            invertUpDown: !this.state.invertUpDown
+                        })}>
+                        <div className='InnerTextWrapper'>
+                            <span className='Label'>
+                                Invert Y-Axis
+                            </span>
+                            <span className='InvertedYesNo'>
+                                {this.state.invertUpDown ? 'yes' : 'no'}
+                            </span>
+                        </div>
+                    </button >
+                    <div className='LeftPad'
+                        onPointerDown={(ev) => this.trackVertPointer(ev)}
+                        onPointerCancel={(ev) => this.trackVertPointer(ev, true)}
+                        onPointerUp={(ev) => this.trackVertPointer(ev, true)}
+                        onPointerMove={(ev) => this.trackVertPointer(ev)}
+                        onContextMenu={(ev) => this.preventContextMenu(ev)}>
+                        <div className="VertDragArea">
+                            <motion.div
+                                className='ThumbDrag'
+                                drag={false}
+                                initial={{ y: 0 }}
+                                animate={{ y: this.state.controllerState.upDown * -0.8 }} />
+                        </div>
                     </div>
-                </button>
-                <div className='RightPad'
-                    onPointerDown={(ev) => this.trackHorizPointer(ev)}
-                    onPointerCancel={(ev) => this.trackHorizPointer(ev, true)}
-                    onPointerUp={(ev) => this.trackHorizPointer(ev, true)}
-                    onPointerMove={(ev) => this.trackHorizPointer(ev)}
-                    onContextMenu={(ev) => this.preventContextMenu(ev)}>
-                    <div className="HorizDragArea">
-                        <motion.div
-                            className='ThumbDrag'
-                            drag={false}
-                            initial={{ x: 0 }}
-                            animate={{ x: this.state.controllerState.leftRight * 0.8 }} />
+                    <button
+                        className='InvertHorizButton'
+                        style={this.state.invertLeftRight ? { backgroundColor: 'palegreen', color: 'black' } : { backgroundColor: 'grey' }}
+                        onClick={() => this.setState({
+                            invertLeftRight: !this.state.invertLeftRight
+                        })}>
+                        <div className='InnerTextWrapper'>
+                            <span className='Label'>
+                                Invert X-Axis
+                            </span>
+                            <span className='InvertedYesNo'>
+                                {this.state.invertLeftRight ? 'yes' : 'no'}
+                            </span>
+                        </div>
+                    </button>
+                    <div className='RightPad'
+                        onPointerDown={(ev) => this.trackHorizPointer(ev)}
+                        onPointerCancel={(ev) => this.trackHorizPointer(ev, true)}
+                        onPointerUp={(ev) => this.trackHorizPointer(ev, true)}
+                        onPointerMove={(ev) => this.trackHorizPointer(ev)}
+                        onContextMenu={(ev) => this.preventContextMenu(ev)}>
+                        <div className="HorizDragArea">
+                            <motion.div
+                                className='ThumbDrag'
+                                drag={false}
+                                initial={{ x: 0 }}
+                                animate={{ x: this.state.controllerState.leftRight * 0.8 }} />
+                        </div>
                     </div>
-                </div>
-                <motion.button
-                    className='BrakeButton'
-                    initial={this.state.controllerState.brake ? { scale: 1 } : { scale: 1.2 }}
-                    animate={this.state.controllerState.brake ? { scale: 1.2 } : { scale: 1 }}
-                    transition={{ type: 'spring', bounce: 0.5 }}
-                    onPointerDown={() => this.updateBrake(true)}
-                    onPointerUp={() => this.updateBrake(false)}
-                    onPointerCancel={() => this.updateBrake(false)}
-                    onContextMenu={(ev) => this.preventContextMenu(ev)} >
-                    BRAKE
-                </motion.button>
+                    <motion.button
+                        className='BrakeButton'
+                        initial={this.state.controllerState.brake ? { scale: 1 } : { scale: 1.2 }}
+                        animate={this.state.controllerState.brake ? { scale: 1.2 } : { scale: 1 }}
+                        transition={{ type: 'spring', bounce: 0.5 }}
+                        onPointerDown={() => this.updateBrake(true)}
+                        onPointerUp={() => this.updateBrake(false)}
+                        onPointerCancel={() => this.updateBrake(false)}
+                        onContextMenu={(ev) => this.preventContextMenu(ev)} >
+                        BRAKE
+                    </motion.button>
 
-                <AnimatePresence>
-                    {
-                        this.state.gamepadConnected ? (
-                            <motion.div
-                                key="ConnectedMessage"
-                                className="ConnectedMessage"
-                                initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
-                                animate={{ y: 0, scale: 1, opacity: 1 }}
-                                transition={{ type: 'spring', bounce: 0.5 }} >
-                                Controller Connected
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="DisconnectedMessage"
-                                className='ConnectedMessage'
-                                initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
-                                animate={{ y: 0, scale: 1, opacity: 1 }}
-                                transition={{ type: 'spring', bounce: 0.5 }} >
-                                Controller Disconnected
-                            </motion.div>
-                        )
-                    }
-                </AnimatePresence>
-
-
-                <AnimatePresence>
-                    {
-                        this.props.checkingApiAlive ? (
-                            <motion.div
-                                key="ValidatingApiAlive"
-                                className='ApiAliveMessage Validating'
-                                initial={{ y: 20, scale: 0.8, opacity: 0 }}
-                                animate={{ y: 0, scale: 1, opacity: 1 }}
-                                transition={{ type: 'spring', bounce: 0.5 }} >
-                                Validating API
-                            </motion.div>
-                        ) : (
-                            this.props.apiAlive ? (
+                    <AnimatePresence>
+                        {
+                            this.state.gamepadConnected ? (
                                 <motion.div
-                                    key="ApiAlive"
-                                    className='ApiAliveMessage Success'
-                                    initial={{ y: 20, scale: 0.8, opacity: 0 }}
-                                    animate={{
-                                        y: [20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20],
-                                        scale: [0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.8],
-                                        opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
-                                    }}
+                                    key="ConnectedMessage"
+                                    className="ConnectedMessage"
+                                    initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
+                                    animate={{ y: 0, scale: 1, opacity: 1 }}
                                     transition={{ type: 'spring', bounce: 0.5 }} >
-                                    API Found
+                                    Controller Connected
                                 </motion.div>
                             ) : (
                                 <motion.div
-                                    key="ApiNotAlive"
-                                    className='ApiAliveMessage Failure'
+                                    key="DisconnectedMessage"
+                                    className='ConnectedMessage'
+                                    initial={this.state.gamepadWasConnected ? { y: 0, scale: 1, opacity: 1 } : { y: 20, scale: 0.8, opacity: 0 }}
+                                    animate={{ y: 0, scale: 1, opacity: 1 }}
+                                    transition={{ type: 'spring', bounce: 0.5 }} >
+                                    Controller Disconnected
+                                </motion.div>
+                            )
+                        }
+                    </AnimatePresence>
+
+
+                    <AnimatePresence>
+                        {
+                            this.props.checkingApiAlive ? (
+                                <motion.div
+                                    key="ValidatingApiAlive"
+                                    className='ApiAliveMessage Validating'
                                     initial={{ y: 20, scale: 0.8, opacity: 0 }}
                                     animate={{ y: 0, scale: 1, opacity: 1 }}
                                     transition={{ type: 'spring', bounce: 0.5 }} >
-                                    API Not Found
+                                    Validating API
                                 </motion.div>
+                            ) : (
+                                this.props.apiAlive ? (
+                                    <motion.div
+                                        key="ApiAlive"
+                                        className='ApiAliveMessage Success'
+                                        initial={{ y: 20, scale: 0.8, opacity: 0 }}
+                                        animate={{
+                                            y: [20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20],
+                                            scale: [0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.8],
+                                            opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+                                        }}
+                                        transition={{ type: 'spring', bounce: 0.5 }} >
+                                        API Found
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="ApiNotAlive"
+                                        className='ApiAliveMessage Failure'
+                                        initial={{ y: 20, scale: 0.8, opacity: 0 }}
+                                        animate={{ y: 0, scale: 1, opacity: 1 }}
+                                        transition={{ type: 'spring', bounce: 0.5 }} >
+                                        API Not Found
+                                    </motion.div>
+                                )
                             )
-                        )
-                    }
-                </AnimatePresence>
-            </div>
+                        }
+                    </AnimatePresence>
+                </div >
+            )
         );
     }
 }

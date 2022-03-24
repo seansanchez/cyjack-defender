@@ -85,7 +85,6 @@ export class App extends React.Component<Record<never, never>, IAppState> {
     }
 
     render() {
-
         return (
             <div className="App" >
                 <header className="App-header">
