@@ -67,9 +67,11 @@ namespace Cyjack.Web
                             case SecurityActionEnum.None:
                                 break;
                             case SecurityActionEnum.Stop:
+                                _logger.LogInformation("Stopping motors due to Security Action Message");
                                 _axle.EmergencyStopForSecurityException();
                                 break;
                             case SecurityActionEnum.Recover:
+                                _logger.LogInformation("Reconnecting motors due to Recover Action Message");
                                 _axle.RecoverFromEmergencyStop();
                                 break;
                             default:
