@@ -1,8 +1,12 @@
+using Cyjack.Enums;
 using Cyjack.Extensions;
+using Cyjack.Functions.Models;
 using Cyjack.Functions.Services;
+using Cyjack.Models;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Cyjack.Functions
 {
@@ -33,7 +37,22 @@ namespace Cyjack.Functions
             {
                 try
                 {
-                    var messageBody = eventData.Body.ToString();
+                    var messageBody = System.Text.Encoding.UTF8.GetString(eventData.Body);
+                    var records = JsonConvert.DeserializeObject<RecordsModel>(messageBody);
+
+                    foreach (var record in records.Records)
+                    {
+                        var extendedProperties = JsonConvert.DeserializeObject<ExtendedProperties>(record.ExtendedProperties);
+
+                        await _ioTServiceClientService
+                            .SendSecurityActionMessageAsync(extendedProperties.DeviceId, new SecurityActionMessage() 
+                            {
+                                Message = record.Description,
+                                SecurityAction = SecurityActionEnum.Stop
+
+                            })
+                            .ConfigureAwait(false);
+                    }
 
                     // Replace these two lines with your processing logic.
                     log.LogInformation($"C# Event Hub trigger function processed a message: {messageBody}");
