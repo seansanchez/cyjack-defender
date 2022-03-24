@@ -46,8 +46,8 @@ namespace Cyjack.Web.Controllers
             }
         }
 
-        [HttpGet("Recover")]
-        public IActionResult Recover()
+        [HttpGet("RecoverFromSecurityException")]
+        public IActionResult RecoverFromSecurityException()
         {
             this._axle.RecoverFromEmergencyStop();
 
