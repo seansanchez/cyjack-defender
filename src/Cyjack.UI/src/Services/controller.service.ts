@@ -14,6 +14,14 @@ export async function CheckApiAlive(ipAddress: string) {
     return response.data;
 }
 
+export async function RecoverFromSecurityException(ipAddress: string) {
+    const response: AxiosResponse = await axios.get(`${ipAddress}/api/Gpio/RecoverFromSecurityException`,
+        { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    return response.data;
+}
+
 export async function SendControllerCommands(ipAddress: string, controllerState: IControllerState) {
     const response: AxiosResponse = await axios.post(`${ipAddress}/api/Gpio/ControllerState`,
         controllerState,

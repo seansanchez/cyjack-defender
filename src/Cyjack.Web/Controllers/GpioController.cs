@@ -45,5 +45,13 @@ namespace Cyjack.Web.Controllers
 
             }
         }
+
+        [HttpGet("Recover")]
+        public IActionResult Recover()
+        {
+            this._axle.RecoverFromEmergencyStop();
+
+            return Ok();
+        }
     }
 }

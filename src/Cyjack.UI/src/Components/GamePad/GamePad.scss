@@ -1,7 +1,53 @@
-.GamePad {
-    width: 100%;
-    height: calc(100vh - 4rem);
-    overflow: hidden;
+.ErrorScreen {
+    position: absolute;
+    display: flex;
+    top: 7rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+
+    .ErrorMessageWrapper {
+        width: 28rem;
+        height: 8rem;
+        border-radius: 16px;
+        box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.132), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.108);
+        background-color: indianred;
+        color: white;
+        padding: 0.5rem 1rem;
+
+        .ErrorTitle {
+            display: block;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .ErrorMessage {
+            display: block;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .RecoverButton {
+            margin-top: 1.5rem;
+            background-color: white;
+            color: black;
+            border-radius: 8px;
+            height: 2rem;
+            border: none;
+            font-weight: bold;
+            box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.132), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.108);
+            user-select: none;
+
+            &:disabled {
+                background-color: lightgray;
+                opacity: 0.9;
+                pointer-events: none;
+            }
+        }
+    }
 }
 
 .BrakeButton {
